@@ -80,9 +80,11 @@ export default function App() {
     setError(null);
 
     const trackSlug = selectedMeeting.slug || selectedMeeting.track;
-    const country = selectedMeeting.country || 'au';
+    const country = selectedMeeting.country || null;
+    const selectedRace = selectedMeeting.races?.find(r => r.raceNumber === selectedRaceNumber);
+    const timezone = selectedRace?.timezone || selectedMeeting.timezone || null;
 
-    fetchRaceAndPrediction(selectedDate, trackSlug, selectedRaceNumber, raceCode)
+    fetchRaceAndPrediction(selectedDate, trackSlug, selectedRaceNumber, raceCode, 10000, country, timezone)
       .then((res) => {
         if (isCancelled) return;
         setRaceData(res);
@@ -109,13 +111,19 @@ export default function App() {
     setIsSimulating(true);
     try {
       const trackSlug = selectedMeeting.slug || selectedMeeting.track;
+      const country = selectedMeeting.country || null;
+      const selectedRace = selectedMeeting.races?.find(r => r.raceNumber === selectedRaceNumber);
+      const timezone = selectedRace?.timezone || selectedMeeting.timezone || null;
+
       const res = await simulateCustomWeights(
         selectedDate,
         trackSlug,
         selectedRaceNumber,
         raceCode,
         weights,
-        simulations
+        simulations,
+        country,
+        timezone
       );
       setRaceData(res);
     } catch (err) {

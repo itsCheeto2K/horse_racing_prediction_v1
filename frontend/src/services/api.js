@@ -16,8 +16,19 @@ export async function fetchMeetings(date, raceCode = 'gallops') {
   return res.json();
 }
 
-export async function fetchRaceAndPrediction(date, track, race, raceCode = 'gallops', simulations = 10000) {
-  const url = `${API_BASE}/race?date=${encodeURIComponent(date)}&track=${encodeURIComponent(track)}&race=${race}&race_code=${encodeURIComponent(raceCode)}&simulations=${simulations}`;
+export async function fetchRaceAndPrediction(
+  date,
+  track,
+  race,
+  raceCode = 'gallops',
+  simulations = 10000,
+  country = null,
+  timezone = null
+) {
+  let url = `${API_BASE}/race?date=${encodeURIComponent(date)}&track=${encodeURIComponent(track)}&race=${race}&race_code=${encodeURIComponent(raceCode)}&simulations=${simulations}`;
+  if (country) url += `&country=${encodeURIComponent(country.toLowerCase())}`;
+  if (timezone) url += `&timezone=${encodeURIComponent(timezone)}`;
+
   const res = await fetch(url);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -26,7 +37,16 @@ export async function fetchRaceAndPrediction(date, track, race, raceCode = 'gall
   return res.json();
 }
 
-export async function simulateCustomWeights(date, track, race, raceCode = 'gallops', weights, simulations = 10000) {
+export async function simulateCustomWeights(
+  date,
+  track,
+  race,
+  raceCode = 'gallops',
+  weights = null,
+  simulations = 10000,
+  country = null,
+  timezone = null
+) {
   const res = await fetch(`${API_BASE}/race/simulate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -36,7 +56,9 @@ export async function simulateCustomWeights(date, track, race, raceCode = 'gallo
       race,
       race_code: raceCode,
       simulations,
-      weights
+      weights,
+      country: country ? country.toLowerCase() : null,
+      timezone: timezone || null
     })
   });
   if (!res.ok) {

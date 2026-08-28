@@ -34,7 +34,8 @@ class CustomSimulationRequest(BaseModel):
     track: str
     race: int
     race_code: str = "gallops"
-    country: str = "au"
+    country: Optional[str] = None
+    timezone: Optional[str] = None
     simulations: int = 10000
     weights: Optional[Dict[str, float]] = None
 
@@ -63,7 +64,7 @@ def get_venues(
 def get_meetings(
     meeting_date: Optional[str] = Query(None, alias="date"),
     race_code: str = Query("gallops"),
-    timezone: str = Query("Australia/Sydney")
+    timezone: Optional[str] = Query(None)
 ):
     if not meeting_date:
         meeting_date = date.today().isoformat()
@@ -79,8 +80,8 @@ def get_race_and_predict(
     track: str = Query(...),
     race: int = Query(..., ge=1, le=20),
     race_code: str = Query("gallops"),
-    country: str = Query("au"),
-    timezone: str = Query("Australia/Sydney"),
+    country: Optional[str] = Query(None),
+    timezone: Optional[str] = Query(None),
     simulations: int = Query(10000, ge=500, le=50000)
 ):
     """
@@ -124,7 +125,8 @@ def simulate_custom_weights(req: CustomSimulationRequest):
             track=req.track,
             race=req.race,
             race_code=req.race_code,
-            country=req.country
+            country=req.country,
+            timezone=req.timezone
         )
 
         predictions = cpp_engine.predict_race(

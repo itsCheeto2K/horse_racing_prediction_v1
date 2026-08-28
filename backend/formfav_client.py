@@ -53,18 +53,20 @@ class FormFavClient:
         self._set_cache(cache_key, data)
         return data
 
-    def get_meetings(self, date: str, race_code: str = "gallops", timezone: str = "Australia/Sydney") -> Dict[str, Any]:
+    def get_meetings(self, date: str, race_code: str = "gallops", timezone: Optional[str] = None) -> Dict[str, Any]:
         """List all racing meetings and their scheduled races for a date."""
-        cache_key = f"meetings:{date}:{race_code}:{timezone}"
+        cache_key = f"meetings:{date}:{race_code}:{timezone or 'all'}"
         cached = self._get_cached(cache_key, ttl_seconds=300)
         if cached:
             return cached
 
         params = {
             "date": date,
-            "race_code": race_code,
-            "timezone": timezone
+            "race_code": race_code
         }
+        if timezone:
+            params["timezone"] = timezone
+
         url = f"{self.BASE_URL}/form/meetings"
         response = self.session.get(url, params=params, timeout=12)
         response.raise_for_status()
@@ -78,11 +80,11 @@ class FormFavClient:
         track: str,
         race: int,
         race_code: str = "gallops",
-        country: str = "au",
-        timezone: str = "Australia/Sydney"
+        country: Optional[str] = None,
+        timezone: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Get full race form and runner statistics for a specific race."""
-        cache_key = f"race:{date}:{track}:{race}:{race_code}:{country}"
+        """Get full race form and runner statistics for a specific race across any country/timezone."""
+        cache_key = f"race:{date}:{track}:{race}:{race_code}:{country or 'all'}:{timezone or 'default'}"
         cached = self._get_cached(cache_key, ttl_seconds=600)
         if cached:
             return cached
@@ -91,13 +93,17 @@ class FormFavClient:
             "date": date,
             "track": track,
             "race": race,
-            "race_code": race_code,
-            "country": country,
-            "timezone": timezone
+            "race_code": race_code
         }
+        if country:
+            params["country"] = country.lower()
+        if timezone:
+            params["timezone"] = timezone
+
         url = f"{self.BASE_URL}/form"
         response = self.session.get(url, params=params, timeout=12)
         response.raise_for_status()
         data = response.json()
         self._set_cache(cache_key, data)
         return data
+
