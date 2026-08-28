@@ -1,0 +1,10 @@
+.git
+.gitignore
+frontend/
+node_modules
+**/__pycache__
+**/*.pyc
+**/*.bat
+**/*.exe
+**/*.o
+.env

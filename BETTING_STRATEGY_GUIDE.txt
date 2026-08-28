@@ -1,0 +1,90 @@
+================================================================================
+HUONG DAN CHIEN LUOC CHON: TOP PICK - VALUE BET - DARK HORSE
+(QUANTITATIVE HORSE RACING SELECTION & BETTING GUIDE)
+================================================================================
+
+1. TOP PICK (UNG CU VIEN SO 1 - NGUA MANH NHAT)
+--------------------------------------------------------------------------------
+* Dinh nghia:
+  - Con ngua co Xac suat Thang (Win Probability) va Diem danh gia (Power Rating)
+    cao nhat qua 10,000 luot chay mo phong Monte Carlo cua engine C++.
+
+* KHI NAO NEN CHON:
+  1. Xac suat thang vuot troi: Win Prob dat tu 35% - 50%+ (ti le ap dao).
+  2. Co tu 2 Factor Badges tro len (vi du: "Peak Form", "Last Start Winner", 
+     "Distance Specialist").
+  3. Fair Odds (Gia niem yet hop ly) tu $2.00 - $3.50 va thi truong khong bi 
+     ep gia qua sau (< $1.40).
+
+* CHIEN THUAT DANH (BET TYPE):
+  - Single Win: Cuoc Thang don.
+  - Banker (Mo neo): Lam con chu luc de kep cho cac ve Place, Quinella (Top 2), 
+    Exacta (Dung thu tu Top 2), Trifecta (Top 3).
+
+* KHI NAO NEN TRANH:
+  - Khi gia thi truong bi dam qua sau (vi du chi con $1.20 - $1.35) ma mat san 
+    hoac thoi tiet bi thay doi dot ngot.
+
+
+2. VALUE PICK / VALUE BET (KEO THOM - GIA TRI TOAN HOC CAO)
+--------------------------------------------------------------------------------
+* Dinh nghia:
+  - Con ngua co xac suat ve dich cao hon muc nha cai/thi truong danh gia.
+  - Cong thuc Ky vong duong (+EV):
+    EV = (Xac suat Thang cua C++ x Ty le cuoc thi truong) - 1 > 0
+
+* KHI NAO NEN CHON:
+  1. Mo hinh C++ tinh ra Fair Odds khoang $3.50 - $5.50 (Win Prob 20% - 30%), 
+     nhung nha cai dang tra ty le cao hon dang ke (vi du: $6.50 - $9.00).
+  2. Ngua co phong do on dinh (Rank 2 hoac Rank 3), thuong xuyen ve trong Top 3
+     (Place Prob > 65%).
+  3. Day la loai keo dem lai LOI NHUAN DAI HAN nhat theo nguyen ly xac suat.
+
+* CHIEN THUAT DANH (BET TYPE):
+  - Each-Way (EW): Dat cuoc ca Thang (Win) va Top 3 (Place). Neu ngua khong ve 
+    Nhat nhung ve Nhi/Ba van co loi nhuan.
+  - Flat Stake Win: Danh deu tay tren cac keo co Expected Value duong.
+
+
+3. DARK HORSE (NGUA AN SO - KEO BAT NGO / TI LE AN CAO)
+--------------------------------------------------------------------------------
+* Dinh nghia:
+  - Con ngua co rank tong the bac trung (Rank 3 - 6), nhung so huu 1 DIEM MANH
+    DAC THU CU THE co the tao nen dot bien trong ngay thi dau.
+
+* KHI NAO NEN CHON:
+  1. Dieu kien dac biet: Troi mua/san uot va ngua co huy hieu "Condition Specialist" 
+     (Chuyen gia san uot), trong khi cac con top dau khong quen chay san lay.
+  2. Loi the cong: O cu ly ngan (1000m-1200m) ngua co "Inside Draw Advantage" 
+     (Xuat phat cong 1-2).
+  3. Top Pick bi bat loi: Con Top 1 phai ganh trong luong qua nang (60kg+) hoac 
+     boc tham trung cong ngoai cung (Barrier 10-14).
+  4. Ty le cuoc thuong rat cao (Odds tu $9.00 - $25.00+).
+
+* CHIEN THUAT DANH (BET TYPE):
+  - Place Bet: Cuoc ve Top 3 voi ty le Place rat an tuong ($2.50 - $4.50).
+  - Chan phu trong ve Exotic: Them vao chan 2, chan 3 cua ve Quinella / Trifecta
+    de no hu tien thuong khong lo neu co bat ngo xay ra.
+
+
+4. BANG TONG HOP QUYET DINH NHANH (DECISION MATRIX)
+--------------------------------------------------------------------------------
++-------------------+--------------------+------------------+------------------+
+| Tieu chi          | TOP PICK           | VALUE BET        | DARK HORSE       |
++-------------------+--------------------+------------------+------------------+
+| Muc tieu          | Do an toan cao     | Loi nhuan dai han| San ti le an cao |
+| Win Probability   | Cao nhat (> 35%)   | Kha (20% - 32%)  | Trung binh (10-18%)|
+| Fair Odds ly tuong| $1.80 - $3.00      | $3.50 - $6.00    | $8.00 - $20.00+  |
+| Muc do rui ro     | Thap               | Trung binh       | Cao              |
+| Kieu cuoc toi uu  | Win / Banker       | Each-Way / Place | Place / Trifecta |
++-------------------+--------------------+------------------+------------------+
+
+
+5. CHIEN THUOC KET HOP HOAN HAO (PORTFOLIO STRATEGY)
+--------------------------------------------------------------------------------
+Trong 1 ngay dua:
+- 60% Ngan sach : Danh vao cac keo TOP PICK co xac suat thang ap dao.
+- 30% Ngan sach : Danh vao cac keo VALUE BET (Each-Way) de sinh loi dai han.
+- 10% Ngan sach : Danh vao cac keo DARK HORSE (Place hoac ghep Trifecta) de 
+                  san nhung phat dot bien ty le cao.
+================================================================================

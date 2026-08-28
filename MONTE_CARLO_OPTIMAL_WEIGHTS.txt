@@ -1,0 +1,59 @@
+================================================================================
+HUONG DAN TI LE TRONG SO TOI UU TRONG MO PHONG MONTE CARLO (HORSE RACING)
+================================================================================
+
+1. TI LE CHUAN TOAN DIEN (MAC DINH - AP DUNG CHO DA SO CUOC DUA)
+--------------------------------------------------------------------------------
+- Phong do gan day (Form Recency & Momentum)          : 30%
+- Do thich nghi mat san (Track & Condition Affinity)  : 25%
+- Cu ly & Trong luong ganh (Distance & Weight)         : 20%
+- Hieu suat Nai ngua & HLV (Jockey & Trainer)         : 15%
+- Loi the Cong xuat phat (Barrier Draw Bias)           : 10%
+--------------------------------------------------------------------------------
+Tong cong                                             : 100%
+
+* Ly do: 
+  - Phong do va Mat san chiem 55% tong trong so vi day la 2 yeu to co tuong quan
+    cao nhat toi ket qua thuc te. Ngua co phong do cao nhung gap mat san khong
+    quen (vi du san lay Heavy) thuong co ti le truot top rat cao.
+
+
+2. TINH CHINH THEO TUNG KICH BAN CU THE
+--------------------------------------------------------------------------------
+
+A. DUA NUOC RUT NGAN (Sprint 1000m - 1200m)
+   - Dac diem: Toc do ban dau va vi tri xuat phat cuc ky quan trong.
+   - Phong do (Form)             : 30%
+   - Cong xuat phat (Barrier)    : 20%  [Tang len]
+   - Cu ly (Distance)            : 20%
+   - Mat san (Condition)         : 15%
+   - Nai & HLV (Jockey/Trainer)  : 15%
+
+B. SAN UOT / TROI MUA (Soft 6-7, Heavy 8-10)
+   - Dac diem: Can uu tien ngua co kha nang "boi bun" (Wet Track Specialist).
+   - Mat san (Condition)         : 35% - 40%  [Tang manh]
+   - Phong do (Form)             : 25%
+   - Cu ly (Distance)            : 15%
+   - Nai & HLV (Jockey/Trainer)  : 15%
+   - Cong xuat phat (Barrier)    : 5%   [Giam xuong]
+
+C. DUA DUONG DAI / THE LUC (Staying > 1800m - 2400m)
+   - Dac diem: Suc ben, trong luong ganh va chien thuat cua nai ngua quyet dinh.
+   - Cu ly & Can nang (Distance) : 30%  [Tang len]
+   - Phong do (Form)             : 25%
+   - Mat san (Condition)         : 20%
+   - Nai & HLV (Jockey/Trainer)  : 20%  [Tang len]
+   - Cong xuat phat (Barrier)    : 5%   [Giam xuong]
+
+
+3. SO LUOT MO PHONG MONTE CARLO (SIMULATIONS COUNT)
+--------------------------------------------------------------------------------
+- 10,000 luot (Khuyen dung mac dinh):
+  + Thoi gian tinh toan C++: ~0.01 giay.
+  + Sai so phan phoi xac suat: < 0.3%.
+  + Toi uu cho hau het moi cuoc dua.
+
+- 25,000 luot (Do chinh xac cao):
+  + Ap dung khi cuoc dua co tren 14 ngua hoac can xac dinh ti le Value Bet
+    (keo thom / ngua tiem nang) voi do tin cay toan hoc toi da.
+================================================================================

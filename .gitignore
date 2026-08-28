@@ -1,0 +1,32 @@
+# Environment variables & API Keys (DO NOT COMMIT)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# C++ Build Artifacts & Binaries
+cpp_engine/*.exe
+cpp_engine/*.o
+cpp_engine/horse_predictor
+cpp_engine/horse_predictor.exe
+*.obj
+*.out
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
