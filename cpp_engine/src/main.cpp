@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
     bool readStdin = false;
     int simulations = 10000;
     ModelWeights weights;
+    bool customWeightsProvided = false;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -42,21 +43,29 @@ int main(int argc, char* argv[]) {
             simulations = std::stoi(argv[++i]);
         } else if (arg == "--w-form" && i + 1 < argc) {
             weights.formWeight = std::stod(argv[++i]);
+            customWeightsProvided = true;
         } else if (arg == "--w-cond" && i + 1 < argc) {
             weights.conditionWeight = std::stod(argv[++i]);
+            customWeightsProvided = true;
         } else if (arg == "--w-dist" && i + 1 < argc) {
             weights.distanceWeight = std::stod(argv[++i]);
+            customWeightsProvided = true;
         } else if (arg == "--w-jt" && i + 1 < argc) {
             weights.jockeyTrainerWeight = std::stod(argv[++i]);
+            customWeightsProvided = true;
         } else if (arg == "--w-barrier" && i + 1 < argc) {
             weights.barrierWeight = std::stod(argv[++i]);
+            customWeightsProvided = true;
         } else if (arg == "--weights-json" && i + 1 < argc) {
             try {
                 json wj = json::parse(argv[++i]);
                 weights = ModelWeights::fromJson(wj);
+                customWeightsProvided = true;
             } catch (const std::exception& e) {
                 std::cerr << "Warning: Failed to parse weights-json: " << e.what() << "\n";
             }
+        } else if (arg == "--auto-weights") {
+            customWeightsProvided = false;
         } else if (arg == "--output" && i + 1 < argc) {
             outputJsonPath = argv[++i];
         } else if (arg == "--help" || arg == "-h") {
@@ -94,10 +103,15 @@ int main(int argc, char* argv[]) {
         json raceRaw = json::parse(inputContent);
         Race race = Race::fromJson(raceRaw);
 
+        if (!customWeightsProvided) {
+            weights = ModelWeights::getDynamicWeightsForDistance(race.getDistanceMeters());
+        }
+
         CompositeEnsemblePredictor ensemble(weights);
         MonteCarloSimulator simulator(simulations);
 
         RacePredictionResult result = simulator.simulateRace(race, ensemble);
+        result.isDynamicWeights = !customWeightsProvided;
         json outJson = result.toJson();
 
         if (!outputJsonPath.empty()) {

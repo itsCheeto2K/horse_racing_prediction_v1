@@ -295,6 +295,77 @@ void ModelWeights::normalize() {
     }
 }
 
+ModelWeights ModelWeights::getDynamicWeightsForDistance(int distanceMeters) {
+    if (distanceMeters <= 0) {
+        // Default middle distance profile (1400m)
+        ModelWeights w{0.25, 0.21, 0.22, 0.17, 0.15};
+        w.normalize();
+        return w;
+    }
+
+    struct DistanceProfilePoint {
+        int dist;
+        double form;
+        double cond;
+        double distW;
+        double jt;
+        double bar;
+    };
+
+    // AU Racing calibrated distance weight milestones from empirical form benchmarks
+    const std::vector<DistanceProfilePoint> milestones = {
+        {1000, 0.28, 0.18, 0.17, 0.15, 0.22}, // Sprint Short (1000-1100m)
+        {1200, 0.27, 0.19, 0.19, 0.15, 0.20}, // Sprint Standard (1200m)
+        {1400, 0.25, 0.21, 0.22, 0.17, 0.15}, // Middle Distance (1300-1400m)
+        {1600, 0.22, 0.24, 0.25, 0.17, 0.12}, // Mile (1500-1600m)
+        {2000, 0.19, 0.25, 0.29, 0.17, 0.10}, // Intermediate / Long (1800-2000m)
+        {2400, 0.16, 0.27, 0.32, 0.17, 0.08}  // Staying (2100-2400m+)
+    };
+
+    if (distanceMeters <= milestones.front().dist) {
+        ModelWeights w{milestones.front().form, milestones.front().cond, milestones.front().distW, milestones.front().jt, milestones.front().bar};
+        w.normalize();
+        return w;
+    }
+
+    if (distanceMeters >= milestones.back().dist) {
+        ModelWeights w{milestones.back().form, milestones.back().cond, milestones.back().distW, milestones.back().jt, milestones.back().bar};
+        w.normalize();
+        return w;
+    }
+
+    // Continuous linear interpolation between adjacent distance milestones
+    for (size_t i = 0; i < milestones.size() - 1; ++i) {
+        if (distanceMeters >= milestones[i].dist && distanceMeters <= milestones[i + 1].dist) {
+            double t = static_cast<double>(distanceMeters - milestones[i].dist) / 
+                       static_cast<double>(milestones[i + 1].dist - milestones[i].dist);
+            
+            ModelWeights w;
+            w.formWeight = milestones[i].form * (1.0 - t) + milestones[i + 1].form * t;
+            w.conditionWeight = milestones[i].cond * (1.0 - t) + milestones[i + 1].cond * t;
+            w.distanceWeight = milestones[i].distW * (1.0 - t) + milestones[i + 1].distW * t;
+            w.jockeyTrainerWeight = milestones[i].jt * (1.0 - t) + milestones[i + 1].jt * t;
+            w.barrierWeight = milestones[i].bar * (1.0 - t) + milestones[i + 1].bar * t;
+            w.normalize();
+            return w;
+        }
+    }
+
+    ModelWeights w;
+    w.normalize();
+    return w;
+}
+
+std::string ModelWeights::getDistanceCategory(int distanceMeters) {
+    if (distanceMeters <= 0) return "General";
+    if (distanceMeters <= 1100) return "Short Sprint (<=1100m)";
+    if (distanceMeters <= 1250) return "Sprint (1200m)";
+    if (distanceMeters <= 1450) return "Middle Distance (1300-1400m)";
+    if (distanceMeters <= 1700) return "Mile (1500-1600m)";
+    if (distanceMeters <= 2050) return "Intermediate / Long (1800-2000m)";
+    return "Staying (2100m+)";
+}
+
 json FeatureScores::toJson() const {
     return {
         {"formScore", formScore},
@@ -340,8 +411,10 @@ json RacePredictionResult::toJson() const {
         {"raceNumber", raceNumber},
         {"raceName", raceName},
         {"distance", distance},
+        {"distanceCategory", distanceCategory},
         {"condition", condition},
         {"totalSimulations", totalSimulations},
+        {"isDynamicWeights", isDynamicWeights},
         {"appliedWeights", appliedWeights.toJson()},
         {"predictions", predsJson},
         {"topPickName", topPickName},

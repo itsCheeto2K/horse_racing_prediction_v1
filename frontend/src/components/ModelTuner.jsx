@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Sliders, RefreshCw, Cpu, CheckCircle2, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sliders, RefreshCw, Cpu, CheckCircle2, RotateCcw, Zap, Sparkles } from 'lucide-react';
 
 export default function ModelTuner({
   currentWeights,
+  distanceCategory,
+  isDynamicWeights,
   onReSimulate,
   isSimulating
 }) {
@@ -17,6 +19,19 @@ export default function ModelTuner({
   const [weights, setWeights] = useState(defaultWeights);
   const [simulations, setSimulations] = useState(10000);
 
+  // Sync state when currentWeights from prediction changes
+  useEffect(() => {
+    if (currentWeights) {
+      setWeights({
+        formWeight: Math.round((currentWeights.formWeight || 0.25) * 100),
+        conditionWeight: Math.round((currentWeights.conditionWeight || 0.25) * 100),
+        distanceWeight: Math.round((currentWeights.distanceWeight || 0.20) * 100),
+        jockeyTrainerWeight: Math.round((currentWeights.jockeyTrainerWeight || 0.15) * 100),
+        barrierWeight: Math.round((currentWeights.barrierWeight || 0.15) * 100),
+      });
+    }
+  }, [currentWeights]);
+
   const handleSliderChange = (key, value) => {
     setWeights(prev => ({
       ...prev,
@@ -24,8 +39,13 @@ export default function ModelTuner({
     }));
   };
 
-  const handleReset = () => {
-    setWeights(defaultWeights);
+  const handleResetAuto = () => {
+    // Passing null weights re-triggers C++ automatic distance weight calculation
+    onReSimulate(null, simulations);
+  };
+
+  const handlePresetSelect = (presetWeights) => {
+    setWeights(presetWeights);
   };
 
   const handleSubmit = (e) => {
@@ -42,6 +62,13 @@ export default function ModelTuner({
     onReSimulate(normalized, simulations);
   };
 
+  const presets = [
+    { label: 'Sprint (1000-1200m)', w: { formWeight: 28, conditionWeight: 18, distanceWeight: 17, jockeyTrainerWeight: 15, barrierWeight: 22 } },
+    { label: 'Middle (1300-1400m)', w: { formWeight: 25, conditionWeight: 21, distanceWeight: 22, jockeyTrainerWeight: 17, barrierWeight: 15 } },
+    { label: 'Mile (1500-1600m)', w: { formWeight: 22, conditionWeight: 24, distanceWeight: 25, jockeyTrainerWeight: 17, barrierWeight: 12 } },
+    { label: 'Staying (2000m+)', w: { formWeight: 16, conditionWeight: 27, distanceWeight: 32, jockeyTrainerWeight: 17, barrierWeight: 8 } }
+  ];
+
   return (
     <div className="bg-[#131b2e] border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -50,16 +77,49 @@ export default function ModelTuner({
           <h3 className="font-bold text-white text-base">C++ OOP Model Tuner Studio</h3>
         </div>
         <button
-          onClick={handleReset}
-          className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 transition-colors"
+          type="button"
+          onClick={handleResetAuto}
+          className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20"
+          title="Auto-calculate weights using Australian Racing Distance Curve"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
-          Reset
+          <Zap className="w-3.5 h-3.5" />
+          Auto (Distance)
         </button>
       </div>
 
-      <p className="text-xs text-slate-400 leading-relaxed">
-        Tune the Object-Oriented feature strategy weights and re-execute the Monte Carlo stochastic engine in real time.
+      {/* Distance Profile Indicator */}
+      <div className="bg-slate-900/80 border border-slate-700/60 rounded-xl p-2.5 flex items-center justify-between text-xs">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-sky-400" />
+          <div>
+            <span className="text-slate-400">Distance Profile: </span>
+            <span className="font-bold text-white font-mono">{distanceCategory || 'AU Standard'}</span>
+          </div>
+        </div>
+        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${isDynamicWeights !== false ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}`}>
+          {isDynamicWeights !== false ? '⚡ AUTO CALIBRATED' : '🛠️ CUSTOM TUNED'}
+        </span>
+      </div>
+
+      {/* Quick Distance Presets */}
+      <div className="space-y-1.5">
+        <span className="text-[11px] text-slate-400 font-sans">Quick Distance Milestones:</span>
+        <div className="grid grid-cols-2 gap-1.5">
+          {presets.map((p, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handlePresetSelect(p.w)}
+              className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-amber-300 rounded-lg text-[10px] font-mono border border-slate-800 transition-colors text-left truncate"
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-xs text-slate-400 leading-relaxed pt-1">
+        Feature strategy weights are automatically interpolated based on distance. You can also customize them below:
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono">

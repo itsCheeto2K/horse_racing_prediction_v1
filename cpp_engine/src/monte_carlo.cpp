@@ -18,6 +18,7 @@ RacePredictionResult MonteCarloSimulator::simulateRace(const Race& race, const C
     result.raceNumber = race.getRaceNumber();
     result.raceName = race.getRaceName();
     result.distance = race.getDistanceStr();
+    result.distanceCategory = ModelWeights::getDistanceCategory(race.getDistanceMeters());
     result.condition = race.getCondition();
     result.totalSimulations = m_numSimulations;
     result.appliedWeights = predictor.getWeights();

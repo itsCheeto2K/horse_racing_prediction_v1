@@ -1,0 +1,269 @@
+Nếu đây là **AU racing** và engine của bạn hiện dùng 5 feature weights như trên, tôi sẽ không dùng một bộ weight chung cho mọi cự ly. Đặc tính của race thay đổi khá rõ giữa sprint, middle-distance và staying; dữ liệu form AU cũng thường có các trường `Track`, `Dist`, `Track/Dist`, ground condition, barrier, weight và form gần đây để khai thác. ([Racing Australia][1])
+
+Tôi đề xuất bắt đầu với bộ weight sau:
+
+| Cự ly           | Recency & Momentum | Track/Ground | Distance & Weight | Jockey/Trainer | Barrier |
+| --------------- | -----------------: | -----------: | ----------------: | -------------: | ------: |
+| **1000–1100m**  |            **28%** |          18% |               17% |            15% | **22%** |
+| **1200m**       |            **27%** |          19% |               19% |            15% | **20%** |
+| **1300–1400m**  |            **25%** |          21% |           **22%** |            17% |     15% |
+| **1500–1600m**  |            **22%** |          24% |           **25%** |            17% |     12% |
+| **1800–2000m**  |            **19%** |      **25%** |           **29%** |            17% |     10% |
+| **2100–2400m+** |            **16%** |      **27%** |           **32%** |            17% |      8% |
+
+### Vì sao nên chỉnh như vậy?
+
+**1000–1100m — Sprint**
+
+Đây là nơi tôi sẽ tăng `Barrier / Gate` và `Recency`.
+
+Race ngắn có rất ít thời gian để sửa sai. Một horse bị wide từ barrier xấu có thể phải dùng thêm năng lượng ngay từ đầu; ngược lại draw tốt có thể giúp tiết kiệm ground. Dữ liệu AU thực tế cũng cho thấy các race 1000–1100m rất phổ biến và form thường được đánh giá cùng barrier/weight/jockey. ([Racing Australia][2])
+
+```text
+Momentum       28
+Track/Ground   18
+Distance       17
+Jockey/Trainer 15
+Barrier        22
+```
+
+Tôi **không khuyến nghị** để Barrier >25% ngay cả ở sprint, vì như vậy model rất dễ overfit theo draw.
+
+---
+
+**1200m — Sprint chuẩn**
+
+Đây có thể là distance quan trọng nhất để bạn tune riêng vì 1200m xuất hiện cực nhiều trong Australian racing.
+
+```text
+Momentum       27
+Track/Ground   19
+Distance       19
+Jockey/Trainer 15
+Barrier        20
+```
+
+Ở 1200m, recent form vẫn rất quan trọng, nhưng `Distance Fit` bắt đầu có ý nghĩa rõ hơn.
+
+---
+
+**1300–1400m — Middle distance**
+
+Đây là vùng tôi thích dùng gần với weight hiện tại của bạn nhất:
+
+```text
+Momentum       25
+Track/Ground   21
+Distance       22
+Jockey/Trainer 17
+Barrier        15
+```
+
+1400m bắt đầu thưởng cho horse có khả năng duy trì pace chứ không đơn thuần là early speed. Dữ liệu form AU cũng thường cho thấy thành tích riêng theo distance và track/distance, ví dụ 1400m, 1200m, 1600m được tách riêng. ([Racing Australia][3])
+
+---
+
+**1500–1600m — Mile**
+
+Tôi sẽ bắt đầu giảm Barrier và tăng `Distance Fit & Weight Advantage`.
+
+```text
+Momentum       22
+Track/Ground   24
+Distance       25
+Jockey/Trainer 17
+Barrier        12
+```
+
+Ở đây feature "Distance Fit" của bạn nên thực sự bao gồm:
+
+```text
+Previous performance at distance
+Track/Distance performance
+Weight carried
+Recent distance progression
+Ability to sustain final 600m
+```
+
+Nếu hiện tại code của bạn chỉ tính kiểu:
+
+```cpp
+distanceDifference = abs(currentDistance - preferredDistance);
+```
+
+thì tôi sẽ nâng cấp phần này. Nó sẽ có giá trị hơn nhiều so với việc đơn giản tăng weight.
+
+---
+
+**1800–2000m**
+
+Đây là lúc tôi sẽ chuyển trọng tâm sang `Distance + Ground`.
+
+```text
+Momentum       19
+Track/Ground   25
+Distance       29
+Jockey/Trainer 17
+Barrier        10
+```
+
+Đặc biệt, `Track/Ground Affinity` không nên chỉ là:
+
+```text
+Good record
+Soft record
+Heavy record
+```
+
+mà nên có interaction:
+
+```text
+Track × Ground × Distance
+```
+
+Ví dụ một horse có record tốt trên Soft nhưng phần lớn thành tích đó đến từ 1200–1400m thì không nên đánh giá nó quá cao cho 2000m Soft.
+
+---
+
+**2100–2400m+ — Staying**
+
+Tôi sẽ cho `Distance Fit & Weight Advantage` cao nhất:
+
+```text
+Momentum       16
+Track/Ground   27
+Distance       32
+Jockey/Trainer 17
+Barrier         8
+```
+
+Ở staying race, Barrier vẫn có giá trị nhưng tôi không muốn engine coi nó là yếu tố quá lớn. Có nhiều thời gian hơn để jockey quản lý vị trí và pace.
+
+---
+
+### Quan trọng hơn: đừng chỉ tạo 6 bộ weight
+
+Nếu đây là **Monte Carlo engine**, tôi sẽ làm dynamic weight theo distance.
+
+Ví dụ:
+
+```cpp
+if (distance <= 1100)
+    weights = SprintShort;
+
+else if (distance <= 1200)
+    weights = Sprint;
+
+else if (distance <= 1400)
+    weights = Middle;
+
+else if (distance <= 1600)
+    weights = Mile;
+
+else if (distance <= 2000)
+    weights = Long;
+
+else
+    weights = Staying;
+```
+
+Nhưng tốt hơn nữa là **interpolate** giữa các mốc thay vì nhảy weight đột ngột.
+
+Ví dụ 1400m:
+
+```text
+1300m → Middle profile
+1400m → Middle profile
+1500m → 70% Middle + 30% Mile
+1600m → Mile profile
+```
+
+Như vậy 1490m và 1500m sẽ không tạo ra hai behavior hoàn toàn khác nhau.
+
+### Tôi cũng sẽ chỉnh cách Monte Carlo sử dụng weight
+
+Đừng làm:
+
+```cpp
+score =
+    form * 0.25 +
+    ground * 0.25 +
+    distance * 0.20 +
+    jockey * 0.15 +
+    barrier * 0.15;
+```
+
+rồi chạy Monte Carlo trên cùng một score.
+
+Nên làm:
+
+```cpp
+horseScore =
+    wForm     * formScore +
+    wGround   * groundScore +
+    wDistance * distanceScore +
+    wJockey   * jockeyScore +
+    wBarrier  * barrierScore;
+```
+
+sau đó biến `horseScore` thành một **distribution** chứ không phải một xác suất cứng:
+
+```cpp
+performance ~ Normal(
+    horseScore,
+    uncertainty
+);
+```
+
+và mỗi simulation:
+
+```text
+1. sample horse performance
+2. sample race variance
+3. rank all horses
+4. record winner
+5. record Top 2
+6. record Top 3
+7. repeat 10,000–100,000 times
+```
+
+Kết quả cuối cùng:
+
+```text
+Horse A
+Win: 31.7%
+Top 2: 54.2%
+Top 3: 68.8%
+
+Horse B
+Win: 24.1%
+Top 2: 47.5%
+Top 3: 63.0%
+```
+
+sẽ hợp lý hơn nhiều so với việc chỉ xuất ra:
+
+```text
+Horse A: 87.2 score
+Horse B: 84.1 score
+```
+
+### Một điểm tôi đặc biệt khuyên bạn sửa
+
+Tên `Distance Fit & Weight Advantage` hiện đang gộp **hai khái niệm khác nhau**:
+
+```text
+Distance Fit
+Weight Advantage
+```
+
+Trong horse racing AU, tôi sẽ tách thành:
+
+```text
+Distance Fit          15–20%
+Weight Advantage       5–10%
+```
+
+rồi normalize lại.
+
+Bởi vì một horse có preferred distance 1400m và một horse mang 54kg là **hai advantage hoàn toàn khác nhau**. Nếu gộp chúng, model rất khó giải thích tại sao nó chọn horse đó.

@@ -155,6 +155,10 @@ struct ModelWeights {
     static ModelWeights fromJson(const json& j);
     json toJson() const;
     void normalize();
+
+    // Auto-calculate dynamic weights interpolated by race distance (AU Racing standards)
+    static ModelWeights getDynamicWeightsForDistance(int distanceMeters);
+    static std::string getDistanceCategory(int distanceMeters);
 };
 
 // Breakdown of individual feature ratings for transparency
@@ -199,8 +203,10 @@ struct RacePredictionResult {
     int raceNumber = 1;
     std::string raceName;
     std::string distance;
+    std::string distanceCategory;
     std::string condition;
     int totalSimulations = 10000;
+    bool isDynamicWeights = false;
     ModelWeights appliedWeights;
     std::vector<RunnerPrediction> runnerPredictions;
     std::string topPickName;

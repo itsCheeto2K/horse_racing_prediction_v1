@@ -207,6 +207,8 @@ export default function App() {
               <div className="space-y-6">
                 <ModelTuner
                   currentWeights={raceData.prediction?.appliedWeights}
+                  distanceCategory={raceData.prediction?.distanceCategory}
+                  isDynamicWeights={raceData.prediction?.isDynamicWeights}
                   onReSimulate={handleReSimulate}
                   isSimulating={isSimulating}
                 />

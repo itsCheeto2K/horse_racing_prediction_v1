@@ -60,7 +60,12 @@ export default function RaceHeader({ formData, predictionData }) {
           <Flag className="w-4 h-4 text-amber-400 shrink-0" />
           <div>
             <div className="text-slate-400 text-[10px] uppercase font-sans">Distance</div>
-            <div className="font-bold text-slate-100">{formData.distance || 'N/A'}</div>
+            <div className="font-bold text-slate-100 flex items-center gap-1.5">
+              <span>{formData.distance || 'N/A'}</span>
+              {predictionData?.distanceCategory && (
+                <span className="text-[10px] text-amber-400 font-sans font-normal">({predictionData.distanceCategory})</span>
+              )}
+            </div>
           </div>
         </div>
 
