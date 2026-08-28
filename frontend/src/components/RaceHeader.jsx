@@ -55,7 +55,7 @@ export default function RaceHeader({ formData, predictionData }) {
       </div>
 
       {/* Race Metadata Metric Badges */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2.5 text-xs font-mono">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs font-mono">
         <div className="bg-slate-900/70 border border-slate-800 rounded-lg p-2.5 flex items-center gap-2.5">
           <Flag className="w-4 h-4 text-amber-400 shrink-0" />
           <div>
@@ -93,11 +93,22 @@ export default function RaceHeader({ formData, predictionData }) {
           </div>
         </div>
 
-        <div className="bg-slate-900/70 border border-slate-800 rounded-lg p-2.5 flex items-center gap-2.5 col-span-2 sm:col-span-1">
+        <div className="bg-slate-900/70 border border-slate-800 rounded-lg p-2.5 flex items-center gap-2.5">
           <Users className="w-4 h-4 text-purple-400 shrink-0" />
           <div>
             <div className="text-slate-400 text-[10px] uppercase font-sans">Field Size</div>
             <div className="font-bold text-slate-100">{formData.runners?.length || 0} Runners</div>
+          </div>
+        </div>
+
+        {/* Venue Timezone / Start Time Badge */}
+        <div className="bg-slate-900/70 border border-slate-800 rounded-lg p-2.5 flex items-center gap-2.5">
+          <HelpCircle className="w-4 h-4 text-cyan-400 shrink-0" />
+          <div>
+            <div className="text-slate-400 text-[10px] uppercase font-sans">Timezone & Place</div>
+            <div className="font-bold text-slate-100 text-[11px] truncate">
+              {formData.timezone ? formData.timezone.split('/').pop().replace(/_/g, ' ') : (formData.country ? formData.country.toUpperCase() : 'Live')}
+            </div>
           </div>
         </div>
       </div>

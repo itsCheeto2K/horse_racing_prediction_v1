@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
+import Navbar, { getLocalDateString } from './components/Navbar';
 import MeetingSelector from './components/MeetingSelector';
 import RaceHeader from './components/RaceHeader';
 import PredictionMatrix from './components/PredictionMatrix';
@@ -10,7 +10,7 @@ import { fetchHealth, fetchMeetings, fetchRaceAndPrediction, simulateCustomWeigh
 import { AlertCircle, RefreshCw, Layers } from 'lucide-react';
 
 export default function App() {
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(() => getLocalDateString(new Date()));
   const [raceCode, setRaceCode] = useState('gallops');
   const [healthStatus, setHealthStatus] = useState(null);
 

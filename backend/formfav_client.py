@@ -83,27 +83,85 @@ class FormFavClient:
         country: Optional[str] = None,
         timezone: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Get full race form and runner statistics for a specific race across any country/timezone."""
-        cache_key = f"race:{date}:{track}:{race}:{race_code}:{country or 'all'}:{timezone or 'default'}"
+        """
+        Get full race form and runner statistics for a specific race across any country/timezone.
+        Uses multi-strategy parameter fallback to resolve international tracks (e.g. Goodwood GB, Sha Tin HK)
+        where FormFav API might 404 on strict timezone or country parameter combinations.
+        """
+        clean_track = track.strip()
+        cache_key = f"race:{date}:{clean_track.lower()}:{race}:{race_code}:{country or 'all'}:{timezone or 'default'}"
         cached = self._get_cached(cache_key, ttl_seconds=600)
         if cached:
             return cached
 
-        params = {
-            "date": date,
-            "track": track,
-            "race": race,
-            "race_code": race_code
-        }
-        if country:
-            params["country"] = country.lower()
-        if timezone:
-            params["timezone"] = timezone
+        # Prepare list of query parameter strategies to try in order
+        slug_track = clean_track.lower().replace(" ", "-")
+        raw_track = clean_track
+        
+        strategies = []
+        
+        # Strategy 1: Slug track + country + timezone
+        if country and timezone:
+            strategies.append({
+                "date": date, "track": slug_track, "race": race, "race_code": race_code,
+                "country": country.lower(), "timezone": timezone
+            })
+            if raw_track != slug_track:
+                strategies.append({
+                    "date": date, "track": raw_track, "race": race, "race_code": race_code,
+                    "country": country.lower(), "timezone": timezone
+                })
 
-        url = f"{self.BASE_URL}/form"
-        response = self.session.get(url, params=params, timeout=12)
-        response.raise_for_status()
-        data = response.json()
-        self._set_cache(cache_key, data)
-        return data
+        # Strategy 2: Without timezone (timezone formatting differences often cause 404)
+        if country:
+            strategies.append({
+                "date": date, "track": slug_track, "race": race, "race_code": race_code,
+                "country": country.lower()
+            })
+            if raw_track != slug_track:
+                strategies.append({
+                    "date": date, "track": raw_track, "race": race, "race_code": race_code,
+                    "country": country.lower()
+                })
+
+        # Strategy 3: Without country (some venue names are unique globally)
+        strategies.append({
+            "date": date, "track": slug_track, "race": race, "race_code": race_code
+        })
+        if raw_track != slug_track:
+            strategies.append({
+                "date": date, "track": raw_track, "race": race, "race_code": race_code
+            })
+
+        # Deduplicate strategies while maintaining order
+        seen_strategies = []
+        unique_strategies = []
+        for s in strategies:
+            strat_tuple = tuple(sorted(s.items()))
+            if strat_tuple not in seen_strategies:
+                seen_strategies.append(strat_tuple)
+                unique_strategies.append(s)
+
+        last_err = None
+        for strat in unique_strategies:
+            try:
+                url = f"{self.BASE_URL}/form"
+                response = self.session.get(url, params=strat, timeout=12)
+                if response.status_code == 200:
+                    data = response.json()
+                    if data and ("runners" in data or "raceName" in data or "track" in data):
+                        self._set_cache(cache_key, data)
+                        return data
+                elif response.status_code != 404:
+                    response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                last_err = e
+                continue
+
+        # If all strategies fail, raise the last exception or a clear 404
+        if last_err:
+            raise last_err
+        raise requests.exceptions.HTTPError(
+            f"404 Client Error: Not Found for race form at track '{track}' (Race {race}) on {date}"
+        )
 
