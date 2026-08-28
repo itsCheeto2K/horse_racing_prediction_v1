@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Award, DollarSign, Calendar, Compass, Shield, Activity, BarChart2 } from 'lucide-react';
+import { X, Award, DollarSign, Calendar, Compass, Shield, Activity, BarChart2, Sparkles, Layers } from 'lucide-react';
 
 export default function RunnerModal({ runner, prediction, onClose }) {
   if (!runner && !prediction) return null;
@@ -8,6 +8,7 @@ export default function RunnerModal({ runner, prediction, onClose }) {
   const overall = stats.overall || {};
   const conditions = stats.conditions || {};
   const featureScores = prediction?.featureScores || {};
+  const subScores = prediction?.subScores || {};
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
@@ -23,7 +24,11 @@ export default function RunnerModal({ runner, prediction, onClose }) {
               <h2 className="text-xl sm:text-2xl font-black text-white">
                 {runner?.name || prediction?.runnerName}
               </h2>
-              {prediction?.rank && (
+              {prediction?.compositeRank ? (
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/30">
+                  Composite Rank #{prediction.compositeRank}
+                </span>
+              ) : prediction?.rank && (
                 <span className="px-2 py-0.5 rounded-full bg-slate-800 text-amber-400 font-mono text-xs font-bold border border-slate-700">
                   Rank #{prediction.rank}
                 </span>
@@ -43,52 +48,99 @@ export default function RunnerModal({ runner, prediction, onClose }) {
           </button>
         </div>
 
-        {/* Prediction Rating & Probabilities Card */}
+        {/* Composite Probability & Fair Odds Card */}
         {prediction && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-3">
-            <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1.5">
-              <BarChart2 className="w-4 h-4" />
-              C++ OOP Predictive Feature Breakdown
-            </h3>
+          <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-sky-400" />
+                Ensemble Prediction & Monte Carlo Matrix
+              </h3>
+              {prediction.compositeScore !== undefined && prediction.compositeScore !== null && (
+                <span className="text-[11px] font-mono text-slate-400">
+                  Composite Score: <strong className="text-white font-bold">{prediction.compositeScore}</strong>
+                </span>
+              )}
+            </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
               <div className="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
-                <div className="text-slate-400 text-[10px] uppercase font-sans">Power Rating</div>
-                <div className="text-base font-black text-amber-400">{prediction.powerRating} / 100</div>
+                <div className="text-slate-400 text-[10px] uppercase font-sans">Ensemble Win %</div>
+                <div className="text-base font-black text-emerald-400">
+                  {prediction.compositeWinProbability !== undefined
+                    ? `${(prediction.compositeWinProbability * 100).toFixed(1)}%`
+                    : `${(prediction.winProbability * 100).toFixed(1)}%`}
+                </div>
               </div>
               <div className="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
-                <div className="text-slate-400 text-[10px] uppercase font-sans">Win Prob</div>
-                <div className="text-base font-black text-emerald-400">{(prediction.winProbability * 100).toFixed(1)}%</div>
+                <div className="text-slate-400 text-[10px] uppercase font-sans">Place Prob %</div>
+                <div className="text-base font-black text-amber-300">
+                  {prediction.compositePlaceProbability !== undefined
+                    ? `${(prediction.compositePlaceProbability * 100).toFixed(1)}%`
+                    : `${(prediction.placeProbability * 100).toFixed(1)}%`}
+                </div>
               </div>
               <div className="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
                 <div className="text-slate-400 text-[10px] uppercase font-sans">Fair Value Odds</div>
-                <div className="text-base font-black text-sky-400">${prediction.fairOdds?.toFixed(2)}</div>
+                <div className="text-base font-black text-sky-400">
+                  ${(prediction.compositeFairOdds || prediction.fairOdds)?.toFixed(2)}
+                </div>
+              </div>
+              <div className="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
+                <div className="text-slate-400 text-[10px] uppercase font-sans">MC Power Rating</div>
+                <div className="text-base font-black text-amber-400">{prediction.powerRating} / 100</div>
               </div>
             </div>
 
-            {/* Individual Sub-model Scores */}
-            <div className="space-y-2 pt-2 border-t border-slate-800 text-xs">
-              <div className="flex justify-between items-center text-slate-300">
-                <span>Recent Form Score:</span>
-                <span className="font-mono font-bold text-slate-100">{featureScores.formScore?.toFixed(1)} / 100</span>
+            {/* Sub-Score Breakdown */}
+            {subScores && Object.keys(subScores).length > 0 ? (
+              <div className="space-y-2 pt-2 border-t border-slate-800 text-xs">
+                <div className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Ensemble Sub-Score Breakdown (0-100)
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5">
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span>Monte Carlo Win Signal:</span>
+                    <span className="font-mono font-bold text-slate-100">{subScores.monteCarloScore?.toFixed(1)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span>Recent Form (Recency Decay):</span>
+                    <span className="font-mono font-bold text-slate-100">{subScores.recentFormScore?.toFixed(1)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span>Track & Distance (Bayesian):</span>
+                    <span className="font-mono font-bold text-slate-100">{subScores.trackDistanceScore?.toFixed(1)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span>Condition Adaptability:</span>
+                    <span className="font-mono font-bold text-slate-100">{subScores.conditionScore?.toFixed(1)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span>Class Percentile:</span>
+                    <span className="font-mono font-bold text-slate-100">{subScores.classScore?.toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span>Consistency Rating:</span>
+                    <span className="font-mono font-bold text-slate-100">{subScores.consistencyScore?.toFixed(1)}</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between items-center text-slate-300">
-                <span>Condition Fit Score:</span>
-                <span className="font-mono font-bold text-slate-100">{featureScores.conditionScore?.toFixed(1)} / 100</span>
+            ) : (
+              <div className="space-y-2 pt-2 border-t border-slate-800 text-xs">
+                <div className="flex justify-between items-center text-slate-300">
+                  <span>Recent Form Score:</span>
+                  <span className="font-mono font-bold text-slate-100">{featureScores.formScore?.toFixed(1)} / 100</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-300">
+                  <span>Condition Fit Score:</span>
+                  <span className="font-mono font-bold text-slate-100">{featureScores.conditionScore?.toFixed(1)} / 100</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-300">
+                  <span>Distance & Weight Score:</span>
+                  <span className="font-mono font-bold text-slate-100">{featureScores.distanceScore?.toFixed(1)} / 100</span>
+                </div>
               </div>
-              <div className="flex justify-between items-center text-slate-300">
-                <span>Distance & Weight Score:</span>
-                <span className="font-mono font-bold text-slate-100">{featureScores.distanceScore?.toFixed(1)} / 100</span>
-              </div>
-              <div className="flex justify-between items-center text-slate-300">
-                <span>Jockey / Trainer Synergy:</span>
-                <span className="font-mono font-bold text-slate-100">{featureScores.jockeyTrainerScore?.toFixed(1)} / 100</span>
-              </div>
-              <div className="flex justify-between items-center text-slate-300">
-                <span>Barrier Advantage Score:</span>
-                <span className="font-mono font-bold text-slate-100">{featureScores.barrierScore?.toFixed(1)} / 100</span>
-              </div>
-            </div>
+            )}
           </div>
         )}
 

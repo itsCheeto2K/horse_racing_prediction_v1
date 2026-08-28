@@ -25,10 +25,10 @@ export default function PredictionMatrix({ predictions, rawRunners, onSelectRunn
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-400" />
-            C++ OOP Prediction & Probability Matrix
+            Ensemble & C++ Monte Carlo Prediction Matrix
           </h2>
           <p className="text-xs text-slate-400">
-            Ranked by Win Probability from 10,000 stochastic Monte Carlo iterations
+            Ranked by Composite Ensemble Probability (Monte Carlo + Recency Decay + Bayesian Form + Class Percentile)
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
@@ -56,6 +56,10 @@ export default function PredictionMatrix({ predictions, rawRunners, onSelectRunn
             {predictions.map((pred) => {
               const fullRunner = runnerLookup[pred.runnerNumber] || {};
               const isScratched = pred.isScratched || fullRunner.scratched;
+              const displayRank = pred.compositeRank || pred.rank;
+              const winProb = pred.compositeWinProbability !== undefined ? pred.compositeWinProbability : pred.winProbability;
+              const placeProb = pred.compositePlaceProbability !== undefined ? pred.compositePlaceProbability : pred.placeProbability;
+              const fairOdds = pred.compositeFairOdds || pred.fairOdds;
 
               return (
                 <tr
@@ -79,16 +83,16 @@ export default function PredictionMatrix({ predictions, rawRunners, onSelectRunn
                     ) : (
                       <span
                         className={`inline-flex items-center justify-center w-7 h-7 rounded-lg font-black font-mono text-xs ${
-                          pred.rank === 1
+                          displayRank === 1
                             ? 'bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 shadow-md shadow-amber-500/20'
-                            : pred.rank === 2
+                            : displayRank === 2
                             ? 'bg-slate-700 text-slate-100'
-                            : pred.rank === 3
+                            : displayRank === 3
                             ? 'bg-amber-900/60 text-amber-300'
                             : 'bg-slate-800 text-slate-400'
                         }`}
                       >
-                        {pred.rank}
+                        {displayRank}
                       </span>
                     )}
                   </td>
@@ -166,17 +170,17 @@ export default function PredictionMatrix({ predictions, rawRunners, onSelectRunn
                       <div className="space-y-1">
                         <div className="flex justify-between items-center text-xs font-mono">
                           <span className="font-bold text-slate-100">
-                            {(pred.winProbability * 100).toFixed(1)}%
+                            {(winProb * 100).toFixed(1)}%
                           </span>
                         </div>
                         <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
                           <div
                             className={`h-full rounded-full ${
-                              pred.rank === 1
+                              displayRank === 1
                                 ? 'bg-gradient-to-r from-amber-500 to-amber-300'
                                 : 'bg-emerald-500'
                             }`}
-                            style={{ width: `${Math.min(100, Math.max(2, pred.winProbability * 100))}%` }}
+                            style={{ width: `${Math.min(100, Math.max(2, winProb * 100))}%` }}
                           ></div>
                         </div>
                       </div>
@@ -191,13 +195,13 @@ export default function PredictionMatrix({ predictions, rawRunners, onSelectRunn
                       <div className="space-y-1">
                         <div className="flex justify-between items-center text-xs font-mono">
                           <span className="font-bold text-slate-300">
-                            {(pred.placeProbability * 100).toFixed(1)}%
+                            {(placeProb * 100).toFixed(1)}%
                           </span>
                         </div>
                         <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
                           <div
                             className="h-full bg-sky-500 rounded-full"
-                            style={{ width: `${Math.min(100, Math.max(2, pred.placeProbability * 100))}%` }}
+                            style={{ width: `${Math.min(100, Math.max(2, placeProb * 100))}%` }}
                           ></div>
                         </div>
                       </div>
@@ -218,25 +222,27 @@ export default function PredictionMatrix({ predictions, rawRunners, onSelectRunn
                   {/* Calculated Fair Odds */}
                   <td className="py-3.5 px-4 text-right font-mono">
                     {isScratched ? (
-                      <span className="text-slate-500 text-xs">SCR</span>
+                      <span className="text-slate-500 text-xs">-</span>
                     ) : (
-                      <span className="text-sm font-black text-amber-400">
-                        ${pred.fairOdds?.toFixed(2) || '0.00'}
-                      </span>
+                      <div>
+                        <span className="text-base font-bold text-emerald-400">
+                          ${fairOdds?.toFixed(2) || '0.00'}
+                        </span>
+                        <div className="text-[10px] text-slate-400">Fair Value</div>
+                      </div>
                     )}
                   </td>
 
-                  {/* Action / Inspect */}
+                  {/* Action */}
                   <td className="py-3.5 px-4 text-center">
                     <button
                       onClick={() => onSelectRunner(fullRunner, pred)}
-                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 transition-all"
-                      title="Inspect detailed runner stats"
+                      className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                      title="Inspect Subscores & Form Profile"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </td>
-
                 </tr>
               );
             })}

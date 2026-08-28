@@ -1,3 +1,0 @@
-Cập nhật ngày và giờ real-time, tôi thấy qua ngày mới rồi mà today vẫn là ngày hôm trước -> Chứng tỏ bị lỗi
-Cập nhật đầy đủ và chính xác country, timezone, place cho các venue của race
--> Nhiều race vẫn lỗi như vậy (ví dụ): Failed to load race form: 404 Client Error: Not Found for url: https://api.formfav.com/v1/form?date=2026-08-29&track=goodwood&race=4&race_code=gallops&country=gb&timezone=Europe%2FLondon

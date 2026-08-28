@@ -1,0 +1,9 @@
+{
+  "monteCarlo": 0.30,
+  "recentForm": 0.20,
+  "trackDistance": 0.15,
+  "class": 0.15,
+  "connections": 0.10,
+  "consistency": 0.10,
+  "softmaxTemperature": 15.0
+}
