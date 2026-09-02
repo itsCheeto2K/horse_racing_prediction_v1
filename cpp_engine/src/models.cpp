@@ -373,7 +373,56 @@ json FeatureScores::toJson() const {
         {"distanceScore", distanceScore},
         {"jockeyTrainerScore", jockeyTrainerScore},
         {"barrierScore", barrierScore},
-        {"compositeRating", compositeRating}
+        {"compositeRating", compositeRating},
+        {"abilityScore", abilityScore},
+        {"raceFitScore", raceFitScore},
+        {"raceMapScore", raceMapScore}
+    };
+}
+
+json HorseCardData::toJson() const {
+    return {
+        {"runnerName", runnerName},
+        {"runnerNumber", runnerNumber},
+        {"barrier", barrier},
+        {"weight", weight},
+        {"rtg", rtg},
+        {"abilityStars", abilityStars},
+        {"recentFormVerdict", recentFormVerdict},
+        {"recentRunPosition", recentRunPosition},
+        {"recentRunMargin", recentRunMargin},
+        {"recentRunDistance", recentRunDistance},
+        {"recentRunGoing", recentRunGoing},
+        {"recentRunInterpretation", recentRunInterpretation},
+        {"distanceStatus", distanceStatus},
+        {"distanceEvidence", distanceEvidence},
+        {"trackGoingStatus", trackGoingStatus},
+        {"trackGoingEvidence", trackGoingEvidence},
+        {"barrierAssessment", barrierAssessment},
+        {"runningStyle", runningStyle},
+        {"paceFit", paceFit},
+        {"jockeyTrainerStatus", jockeyTrainerStatus},
+        {"abilityRating10", abilityRating10},
+        {"raceFitRating10", raceFitRating10},
+        {"riskLevel", riskLevel},
+        {"marketOdds", marketOdds},
+        {"verdict", verdict}
+    };
+}
+
+json RaceMapSummary::toJson() const {
+    return {
+        {"paceScenario", paceScenario},
+        {"paceDescription", paceDescription},
+        {"leaderCount", leaderCount},
+        {"onPaceCount", onPaceCount},
+        {"midfieldCount", midfieldCount},
+        {"backmarkerCount", backmarkerCount},
+        {"effectiveFieldCount", effectiveFieldCount},
+        {"leaders", leaders},
+        {"onPaceRunners", onPaceRunners},
+        {"midfieldRunners", midfieldRunners},
+        {"backmarkers", backmarkers}
     };
 }
 
@@ -389,12 +438,26 @@ json RunnerPrediction::toJson() const {
         {"powerRating", powerRating},
         {"winProbability", winProbability},
         {"placeProbability", placeProbability},
+        {"top3Probability", top3Probability},
+        {"top5Probability", top5Probability},
         {"fairOdds", fairOdds},
+        {"abilityScore", abilityScore},
+        {"raceFitScore", raceFitScore},
+        {"raceMapScore", raceMapScore},
+        {"runningStyle", runningStyle},
+        {"tier", tier},
+        {"verdict", verdict},
+        {"riskLevel", riskLevel},
+        {"valueEdge", valueEdge},
+        {"valueGrade", valueGrade},
         {"featureScores", featureScores.toJson()},
         {"badges", badges},
+        {"horseCard", horseCard.toJson()},
         {"isTopPick", isTopPick},
         {"isValuePick", isValuePick},
         {"isDarkHorse", isDarkHorse},
+        {"isBestUnderdog", isBestUnderdog},
+        {"isBestLongshot", isBestLongshot},
         {"isScratched", isScratched}
     };
 }
@@ -416,11 +479,16 @@ json RacePredictionResult::toJson() const {
         {"totalSimulations", totalSimulations},
         {"isDynamicWeights", isDynamicWeights},
         {"appliedWeights", appliedWeights.toJson()},
-        {"predictions", predsJson},
+        {"raceMap", raceMap.toJson()},
+        {"top3Candidates", top3Candidates},
         {"topPickName", topPickName},
         {"valuePickName", valuePickName},
-        {"darkHorseName", darkHorseName}
+        {"darkHorseName", darkHorseName},
+        {"bestUnderdogName", bestUnderdogName},
+        {"bestLongshotName", bestLongshotName},
+        {"predictions", predsJson}
     };
 }
 
 } // namespace HorseRacing
+

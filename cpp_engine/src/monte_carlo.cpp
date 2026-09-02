@@ -30,25 +30,37 @@ RacePredictionResult MonteCarloSimulator::simulateRace(const Race& race, const C
 
     size_t numRunners = activeRunners.size();
 
-    // 1. Evaluate baseline power ratings & feature scores for each runner
+    // 1. Race Map & Dynamics Analysis (Tầng 3)
+    RaceMapSummary mapSummary = predictor.getMapPredictor().analyzeRaceMap(race);
+    result.raceMap = mapSummary;
+
+    // 2. 4-Tier Evaluation: Ability, Race Fit, Race Map and initial Horse Cards
     std::vector<FeatureScores> runnerScores(numRunners);
     std::vector<std::vector<std::string>> runnerBadges(numRunners);
+    std::vector<HorseCardData> runnerCards(numRunners);
+    std::vector<RunningStyle> runnerStyles(numRunners);
     std::vector<double> baseRatings(numRunners);
 
     for (size_t i = 0; i < numRunners; ++i) {
-        runnerScores[i] = predictor.evaluateDetailed(activeRunners[i], race, runnerBadges[i]);
+        runnerStyles[i] = predictor.getMapPredictor().inferRunningStyle(activeRunners[i], race);
+        runnerScores[i] = predictor.evaluate4Tier(
+            activeRunners[i],
+            race,
+            mapSummary,
+            runnerStyles[i],
+            runnerBadges[i],
+            runnerCards[i]
+        );
         baseRatings[i] = runnerScores[i].compositeRating;
     }
 
-    // 2. Monte Carlo Stochastic Simulation Loop
-    // Track 1st, 2nd, 3rd place finishes
+    // 3. Monte Carlo Stochastic Simulation Loop (10,000 runs)
     std::vector<int> winCounts(numRunners, 0);
-    std::vector<int> placeCounts(numRunners, 0);
+    std::vector<int> top3Counts(numRunners, 0);
+    std::vector<int> top5Counts(numRunners, 0);
 
     // Standard Gumbel / extreme-value distribution modeling race performance noise
     std::extreme_value_distribution<double> gumbelDist(0.0, 4.5);
-
-    // Scratch buffer for each simulation run: pairs of (simulated_performance, runner_index)
     std::vector<std::pair<double, size_t>> simResults(numRunners);
 
     for (int sim = 0; sim < m_numSimulations; ++sim) {
@@ -65,20 +77,19 @@ RacePredictionResult MonteCarloSimulator::simulateRace(const Race& race, const C
 
         // 1st place
         winCounts[simResults[0].second]++;
-        placeCounts[simResults[0].second]++;
 
-        // 2nd place (if >= 2 runners)
-        if (numRunners >= 2) {
-            placeCounts[simResults[1].second]++;
+        // Top 3 places
+        for (size_t p = 0; p < std::min(numRunners, size_t(3)); ++p) {
+            top3Counts[simResults[p].second]++;
         }
 
-        // 3rd place (if >= 3 runners)
-        if (numRunners >= 3) {
-            placeCounts[simResults[2].second]++;
+        // Top 5 places
+        for (size_t p = 0; p < std::min(numRunners, size_t(5)); ++p) {
+            top5Counts[simResults[p].second]++;
         }
     }
 
-    // 3. Assemble runner predictions
+    // 4. Assemble runner predictions & calculate probabilities
     std::vector<RunnerPrediction> preds;
     preds.reserve(numRunners);
 
@@ -93,7 +104,9 @@ RacePredictionResult MonteCarloSimulator::simulateRace(const Race& race, const C
         pred.powerRating = std::round(baseRatings[i] * 10.0) / 10.0;
         
         pred.winProbability = static_cast<double>(winCounts[i]) / static_cast<double>(m_numSimulations);
-        pred.placeProbability = static_cast<double>(placeCounts[i]) / static_cast<double>(m_numSimulations);
+        pred.top3Probability = static_cast<double>(top3Counts[i]) / static_cast<double>(m_numSimulations);
+        pred.placeProbability = pred.top3Probability; // backward compatibility
+        pred.top5Probability = static_cast<double>(top5Counts[i]) / static_cast<double>(m_numSimulations);
         
         // Fair Decimal Odds = 1 / P(Win)
         if (pred.winProbability > 0.001) {
@@ -102,53 +115,115 @@ RacePredictionResult MonteCarloSimulator::simulateRace(const Race& race, const C
             pred.fairOdds = 101.0;
         }
 
+        // 4-Tier metrics
+        pred.abilityScore = std::round(runnerScores[i].abilityScore * 10.0) / 10.0;
+        pred.raceFitScore = std::round(runnerScores[i].raceFitScore * 10.0) / 10.0;
+        pred.raceMapScore = std::round(runnerScores[i].raceMapScore * 10.0) / 10.0;
+
+        switch (runnerStyles[i]) {
+            case RunningStyle::Leader: pred.runningStyle = "Leader"; break;
+            case RunningStyle::OnPace: pred.runningStyle = "On-pace"; break;
+            case RunningStyle::Midfield: pred.runningStyle = "Midfield"; break;
+            case RunningStyle::Backmarker: pred.runningStyle = "Backmarker"; break;
+        }
+
+        // Tier classification (Section 3 in new_feat.txt)
+        if (pred.fairOdds <= 6.0 || pred.top3Probability >= 0.50) {
+            pred.tier = "Tier A - Main Contender";
+        } else if (pred.fairOdds <= 12.0 || pred.top3Probability >= 0.28) {
+            pred.tier = "Tier B - Secondary Contender";
+        } else if (pred.fairOdds <= 25.0 && (pred.raceFitScore >= 55.0 || pred.abilityScore >= 55.0)) {
+            pred.tier = "Tier C - Value Underdog";
+        } else {
+            pred.tier = "Tier D - Longshot";
+        }
+
         pred.featureScores = runnerScores[i];
         pred.badges = runnerBadges[i];
+        pred.horseCard = runnerCards[i];
+        pred.horseCard.marketOdds = pred.fairOdds;
+        pred.riskLevel = runnerCards[i].riskLevel;
+
         preds.push_back(pred);
     }
 
-    // 4. Sort predictions by Win Probability descending
+    // 5. Sort predictions by Top 3 Probability / Win Probability descending
     std::sort(preds.begin(), preds.end(), [](const RunnerPrediction& a, const RunnerPrediction& b) {
-        if (std::abs(a.winProbability - b.winProbability) > 0.0001) {
+        if (std::abs(a.top3Probability - b.top3Probability) > 0.005) {
+            return a.top3Probability > b.top3Probability;
+        }
+        if (std::abs(a.winProbability - b.winProbability) > 0.001) {
             return a.winProbability > b.winProbability;
         }
         return a.powerRating > b.powerRating;
     });
 
-    // 5. Assign ranks and classify special picks
+    // 6. Assign ranks, Verdicts and classify picks
     for (size_t r = 0; r < preds.size(); ++r) {
         preds[r].rank = static_cast<int>(r + 1);
+    }
+
+    // Identify Top 3 Candidates
+    for (size_t r = 0; r < std::min(preds.size(), size_t(3)); ++r) {
+        result.top3Candidates.push_back(preds[r].runnerName);
     }
 
     if (!preds.empty()) {
         // Top Pick is rank 1
         preds[0].isTopPick = true;
+        preds[0].verdict = "MAIN CONTENDER";
+        preds[0].horseCard.verdict = "MAIN CONTENDER";
         result.topPickName = preds[0].runnerName;
 
-        // Value Pick: runner in top 4 with good rating & odds > $3.50
-        for (size_t r = 1; r < std::min(preds.size(), size_t(4)); ++r) {
-            if (preds[r].fairOdds >= 3.5 && preds[r].powerRating >= 50.0) {
+        if (preds.size() > 1) {
+            preds[1].verdict = (preds[1].tier == "Tier A - Main Contender") ? "MAIN CONTENDER" : "SECONDARY CONTENDER";
+            preds[1].horseCard.verdict = preds[1].verdict;
+        }
+
+        // Value Pick / Best Underdog: Tier C with solid Top 3 % or Rank 3-6 with high Race Fit
+        for (size_t r = 1; r < preds.size(); ++r) {
+            if (preds[r].tier == "Tier C - Value Underdog" || (preds[r].fairOdds >= 6.0 && preds[r].top3Probability >= 0.20 && preds[r].raceFitScore >= 52.0)) {
+                preds[r].isBestUnderdog = true;
                 preds[r].isValuePick = true;
+                preds[r].verdict = "VALUE UNDERDOG";
+                preds[r].horseCard.verdict = "VALUE UNDERDOG";
+                result.bestUnderdogName = preds[r].runnerName;
                 result.valuePickName = preds[r].runnerName;
                 break;
             }
         }
-        if (result.valuePickName.empty() && preds.size() > 1) {
-            preds[1].isValuePick = true;
-            result.valuePickName = preds[1].runnerName;
+
+        // Fallback for Value Pick if no Tier C qualified
+        if (result.valuePickName.empty() && preds.size() > 2) {
+            preds[2].isValuePick = true;
+            preds[2].verdict = "VALUE UNDERDOG";
+            preds[2].horseCard.verdict = "VALUE UNDERDOG";
+            result.valuePickName = preds[2].runnerName;
+            result.bestUnderdogName = preds[2].runnerName;
         }
 
-        // Dark Horse: ranks 3 to 6 with condition or form specialist badge
-        for (size_t r = 2; r < std::min(preds.size(), size_t(6)); ++r) {
-            if (!preds[r].badges.empty() && !preds[r].isValuePick) {
+        // Best Longshot / Dark Horse: Tier D with high pace fit or condition specialist badge
+        for (size_t r = 2; r < preds.size(); ++r) {
+            if (!preds[r].isBestUnderdog && !preds[r].isTopPick && (preds[r].fairOdds >= 15.0 || preds[r].tier == "Tier D - Longshot")) {
+                preds[r].isBestLongshot = true;
                 preds[r].isDarkHorse = true;
+                preds[r].verdict = "LONGSHOT";
+                preds[r].horseCard.verdict = "LONGSHOT";
+                result.bestLongshotName = preds[r].runnerName;
                 result.darkHorseName = preds[r].runnerName;
                 break;
             }
         }
-        if (result.darkHorseName.empty() && preds.size() > 2) {
-            preds[2].isDarkHorse = true;
-            result.darkHorseName = preds[2].runnerName;
+
+        // Set default verdicts for remaining runners
+        for (auto& p : preds) {
+            if (p.verdict.empty() || p.verdict == "CONTENDER") {
+                if (p.rank <= 2) p.verdict = "MAIN CONTENDER";
+                else if (p.rank <= 4) p.verdict = "SECONDARY CONTENDER";
+                else if (p.tier == "Tier C - Value Underdog") p.verdict = "VALUE UNDERDOG";
+                else p.verdict = "OUTSIDER";
+                p.horseCard.verdict = p.verdict;
+            }
         }
     }
 
@@ -166,7 +241,11 @@ RacePredictionResult MonteCarloSimulator::simulateRace(const Race& race, const C
             spred.powerRating = 0.0;
             spred.winProbability = 0.0;
             spred.placeProbability = 0.0;
+            spred.top3Probability = 0.0;
+            spred.top5Probability = 0.0;
             spred.fairOdds = 0.0;
+            spred.tier = "Scratched";
+            spred.verdict = "SCRATCHED";
             spred.isScratched = true;
             preds.push_back(spred);
         }

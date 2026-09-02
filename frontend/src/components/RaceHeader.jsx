@@ -1,12 +1,15 @@
 import React from 'react';
-import { Flag, Wind, Award, DollarSign, Users, Sparkles, Crosshair, HelpCircle } from 'lucide-react';
+import { Flag, Wind, Award, DollarSign, Users, Sparkles, Crosshair, HelpCircle, Activity, Gauge, Flame } from 'lucide-react';
 
 export default function RaceHeader({ formData, predictionData }) {
   if (!formData) return null;
 
   const topPick = predictionData?.topPickName;
-  const valuePick = predictionData?.valuePickName;
-  const darkHorse = predictionData?.darkHorseName;
+  const valuePick = predictionData?.valuePickName || predictionData?.bestUnderdogName;
+  const darkHorse = predictionData?.darkHorseName || predictionData?.bestLongshotName;
+  const top3List = predictionData?.top3Candidates || [];
+  const raceMap = predictionData?.raceMap;
+  const effectiveField = raceMap?.effectiveFieldCount || formData.runners?.length || 0;
 
   return (
     <div className="bg-gradient-to-r from-[#131b2e] to-[#1c2742] border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4">
@@ -31,28 +34,53 @@ export default function RaceHeader({ formData, predictionData }) {
           </h1>
         </div>
 
-        {/* C++ Key Picks Badges */}
+        {/* 4-Tier Pipeline Key Picks Badges */}
         <div className="flex flex-wrap items-center gap-2">
           {topPick && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold shadow-lg shadow-amber-500/10">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Top Pick: <strong className="text-white font-bold">{topPick}</strong></span>
+              <span>#1 Contender: <strong className="text-white font-bold">{topPick}</strong></span>
             </div>
           )}
           {valuePick && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-lg shadow-emerald-500/10">
               <Crosshair className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Value: <strong className="text-white font-bold">{valuePick}</strong></span>
+              <span>Best Underdog: <strong className="text-white font-bold">{valuePick}</strong></span>
             </div>
           )}
           {darkHorse && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 border border-purple-500/40 text-purple-300 text-xs font-semibold shadow-lg shadow-purple-500/10">
               <Flame className="w-3.5 h-3.5 text-purple-400" />
-              <span>Dark Horse: <strong className="text-white font-bold">{darkHorse}</strong></span>
+              <span>Best Longshot: <strong className="text-white font-bold">{darkHorse}</strong></span>
             </div>
           )}
         </div>
       </div>
+
+      {/* Top 3 Candidates Overview Banner */}
+      {top3List.length > 0 && (
+        <div className="bg-slate-900/90 border border-amber-500/30 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-black font-mono text-[11px] uppercase">
+              Top 3 Candidates
+            </span>
+            <div className="flex items-center gap-2 font-mono">
+              {top3List.map((name, idx) => (
+                <span key={idx} className="flex items-center gap-1 text-slate-200">
+                  <strong className="text-amber-400 font-bold">{idx + 1}.</strong> {name}
+                  {idx < top3List.length - 1 && <span className="text-slate-600 ml-1">&bull;</span>}
+                </span>
+              ))}
+            </div>
+          </div>
+          {raceMap?.paceScenario && (
+            <div className="flex items-center gap-1.5 font-mono text-slate-300">
+              <Gauge className="w-3.5 h-3.5 text-sky-400" />
+              <span>Pace Shape: <strong className="text-sky-300">{raceMap.paceScenario}</strong></span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Race Metadata Metric Badges */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs font-mono">
@@ -96,8 +124,8 @@ export default function RaceHeader({ formData, predictionData }) {
         <div className="bg-slate-900/70 border border-slate-800 rounded-lg p-2.5 flex items-center gap-2.5">
           <Users className="w-4 h-4 text-purple-400 shrink-0" />
           <div>
-            <div className="text-slate-400 text-[10px] uppercase font-sans">Field Size</div>
-            <div className="font-bold text-slate-100">{formData.runners?.length || 0} Runners</div>
+            <div className="text-slate-400 text-[10px] uppercase font-sans">Effective Field</div>
+            <div className="font-bold text-slate-100">{effectiveField} / {formData.runners?.length || 0} Runners</div>
           </div>
         </div>
 
@@ -113,13 +141,5 @@ export default function RaceHeader({ formData, predictionData }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function Flame(props) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
-    </svg>
   );
 }

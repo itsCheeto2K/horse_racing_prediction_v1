@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar, { getLocalDateString } from './components/Navbar';
 import MeetingSelector from './components/MeetingSelector';
 import RaceHeader from './components/RaceHeader';
+import RaceMapVisualizer from './components/RaceMapVisualizer';
 import PredictionMatrix from './components/PredictionMatrix';
 import ModelTuner from './components/ModelTuner';
 import RunnerModal from './components/RunnerModal';
@@ -194,8 +195,13 @@ export default function App() {
             {/* Grid Layout: Main Matrix + Side Controls */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
-              {/* Left Column: Ranked Prediction Matrix (2/3 width) */}
+              {/* Left Column: Race Map Visualizer & Ranked Prediction Matrix (2/3 width) */}
               <div className="lg:col-span-2 space-y-6">
+                <RaceMapVisualizer
+                  raceMap={raceData.prediction?.raceMap}
+                  predictions={raceData.prediction?.predictions}
+                />
+
                 <PredictionMatrix
                   predictions={raceData.prediction?.predictions}
                   rawRunners={raceData.form?.runners}

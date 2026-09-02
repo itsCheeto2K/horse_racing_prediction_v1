@@ -56,15 +56,24 @@ public:
     std::string generateBadge(const Runner& runner, const Race& race, double score) const override;
 };
 
-// Evaluates gate/barrier draw advantage based on race distance and field size
+// Evaluates gate/barrier draw advantage based on race distance, field size, and running style
 class BarrierBiasPredictor : public IPredictor {
 public:
     double evaluate(const Runner& runner, const Race& race) const override;
+    double evaluateWithStyle(const Runner& runner, const Race& race, RunningStyle style) const;
     std::string getName() const override { return "BarrierBias"; }
     std::string generateBadge(const Runner& runner, const Race& race, double score) const override;
 };
 
-// Composite Ensemble Predictor aggregating multiple modular strategies
+// Evaluates Race Map & Pace dynamics (Tầng 3)
+class RaceMapPredictor {
+public:
+    RunningStyle inferRunningStyle(const Runner& runner, const Race& race) const;
+    RaceMapSummary analyzeRaceMap(const Race& race) const;
+    double evaluatePaceFit(const Runner& runner, const Race& race, RunningStyle style, const RaceMapSummary& mapSummary) const;
+};
+
+// Composite Ensemble Predictor aggregating 4-Tier modular pipeline
 class CompositeEnsemblePredictor : public IPredictor {
 private:
     std::unique_ptr<RecentFormPredictor> m_formPred;
@@ -72,6 +81,7 @@ private:
     std::unique_ptr<DistanceSuitabilityPredictor> m_distPred;
     std::unique_ptr<JockeyTrainerPredictor> m_jtPred;
     std::unique_ptr<BarrierBiasPredictor> m_barPred;
+    std::unique_ptr<RaceMapPredictor> m_mapPred;
     ModelWeights m_weights;
 
 public:
@@ -83,12 +93,24 @@ public:
     }
 
     const ModelWeights& getWeights() const { return m_weights; }
+    const RaceMapPredictor& getMapPredictor() const { return *m_mapPred; }
 
     double evaluate(const Runner& runner, const Race& race) const override;
     std::string getName() const override { return "CompositeEnsemble"; }
 
     // Evaluates all individual feature components and populates FeatureScores and badges
     FeatureScores evaluateDetailed(const Runner& runner, const Race& race, std::vector<std::string>& outBadges) const;
+
+    // 4-Tier comprehensive evaluation with full HorseCard generation
+    FeatureScores evaluate4Tier(
+        const Runner& runner,
+        const Race& race,
+        const RaceMapSummary& mapSummary,
+        RunningStyle style,
+        std::vector<std::string>& outBadges,
+        HorseCardData& outCard
+    ) const;
 };
 
 } // namespace HorseRacing
+

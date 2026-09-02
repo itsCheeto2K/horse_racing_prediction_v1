@@ -303,9 +303,9 @@ def enrich_predictions_with_composite_score(
     market_odds_map: Optional[Dict[int, float]] = None
 ) -> Dict[str, Any]:
     """
-    Combines C++ Monte Carlo probabilities with independent statistical sub-scores
-    into a final Composite Prediction model.
-    Maintains 100% backward compatibility with all original fields while adding new composite metrics.
+    Combines C++ Monte Carlo 4-Tier pipeline with independent statistical sub-scores
+    and normalized Market Probability / Value Edge analysis.
+    Maintains 100% backward compatibility with all original fields while adding new 4-tier pipeline metrics.
     """
     weights = load_default_weights()
     if custom_composite_weights:
@@ -326,6 +326,29 @@ def enrich_predictions_with_composite_score(
     # Filter active runners for class percentile ranking & softmax
     active_runners = [r for r in runners if not r.get("scratched", False)]
 
+    # Normalized Market Odds Probability calculation (Section 17, 18 in new_feat.txt)
+    # P_market = 1 / Odds, P_normal = P_market / sum(P_market)
+    effective_odds_map: Dict[int, float] = {}
+    for r in active_runners:
+        r_num = r.get("number", 0)
+        if market_odds_map and r_num in market_odds_map and market_odds_map[r_num] > 1.0:
+            effective_odds_map[r_num] = market_odds_map[r_num]
+        elif r_num in mc_pred_lookup and mc_pred_lookup[r_num].get("fairOdds", 0) > 1.0:
+            # Fallback to model fair odds with simulated bookmaker 15% overround
+            effective_odds_map[r_num] = round(mc_pred_lookup[r_num]["fairOdds"] * 0.88, 2)
+
+    sum_market_p = sum(1.0 / o for o in effective_odds_map.values() if o > 0)
+    normalized_market_p: Dict[int, float] = {}
+    implied_top3_p: Dict[int, float] = {}
+
+    if sum_market_p > 0:
+        for r_num, o in effective_odds_map.items():
+            raw_p = 1.0 / o
+            norm_p = raw_p / sum_market_p
+            normalized_market_p[r_num] = norm_p
+            # Harville approximation for Top 3 place probability: ~ min(0.95, norm_p * 2.6)
+            implied_top3_p[r_num] = min(0.95, norm_p * 2.6)
+
     runner_results = []
     active_raw_scores = []
     active_indices = []
@@ -343,10 +366,12 @@ def enrich_predictions_with_composite_score(
                 "compositeScore": None,
                 "compositeWinProbability": 0.0,
                 "compositePlaceProbability": 0.0,
+                "compositeTop3Probability": 0.0,
                 "compositeFairOdds": None,
                 "subScores": None,
                 "valueEdge": None,
                 "kellyFraction": None,
+                "valueGrade": "Scratched",
                 "mc_item": mc_item
             })
             continue
@@ -389,6 +414,9 @@ def enrich_predictions_with_composite_score(
             "classScore": round(class_score, 2),
             "connectionsScore": round(conn_score, 2),
             "consistencyScore": round(cons_score, 2),
+            "abilityScore": mc_item.get("abilityScore", round(form_score * 0.65 + class_score * 0.35, 1)),
+            "raceFitScore": mc_item.get("raceFitScore", round(track_dist_cond_score * 0.6 + form_score * 0.4, 1)),
+            "raceMapScore": mc_item.get("raceMapScore", 60.0),
             "lowConfidenceConnections": low_conf_conn
         }
 
@@ -416,6 +444,8 @@ def enrich_predictions_with_composite_score(
 
         for i, res_idx in enumerate(active_indices):
             win_p = win_probs[i]
+            r_num = runner_results[res_idx]["runnerNumber"]
+            
             runner_results[res_idx]["compositeWinProbability"] = round(win_p, 4)
             runner_results[res_idx]["compositeFairOdds"] = round(1.0 / win_p, 2) if win_p > 0 else 999.0
 
@@ -424,19 +454,30 @@ def enrich_predictions_with_composite_score(
             rank_in_active = sorted_active_scores.index(raw_s) + 1
             norm_rank_score = max(0.0, 1.0 - (rank_in_active - 1) / max(num_active - 1, 1))
 
-            # Composite Place Prob: 0.5 * MC_placeProb + 0.5 * normRankScore
-            mc_place_p = float(runner_results[res_idx]["mc_item"].get("placeProbability", 0.0))
-            place_p = max(0.0, min(1.0, 0.5 * mc_place_p + 0.5 * norm_rank_score))
+            # Composite Place Prob & Top 3 Prob
+            mc_place_p = float(runner_results[res_idx]["mc_item"].get("top3Probability") or runner_results[res_idx]["mc_item"].get("placeProbability", 0.0))
+            place_p = max(0.0, min(1.0, 0.6 * mc_place_p + 0.4 * norm_rank_score))
             runner_results[res_idx]["compositePlaceProbability"] = round(place_p, 4)
+            runner_results[res_idx]["compositeTop3Probability"] = round(place_p, 4)
 
-            # Value Edge / Kelly calculation (if market odds provided)
-            r_num = runner_results[res_idx]["runnerNumber"]
-            if market_odds_map and r_num in market_odds_map and market_odds_map[r_num] > 1.0:
-                m_odds = market_odds_map[r_num]
-                implied_p = 1.0 / m_odds
-                edge = win_p - implied_p
+            # Value Edge calculation: Top 3 Model Prob vs Market Implied Top 3 Prob
+            impl_top3 = implied_top3_p.get(r_num)
+            if impl_top3 is not None and impl_top3 > 0:
+                edge = place_p - impl_top3
                 runner_results[res_idx]["valueEdge"] = round(edge, 4)
-                if edge > 0.03:
+                
+                # Value Grade
+                if edge >= 0.10:
+                    runner_results[res_idx]["valueGrade"] = "HIGH VALUE"
+                elif edge >= 0.03:
+                    runner_results[res_idx]["valueGrade"] = "POSITIVE VALUE"
+                elif edge >= -0.03:
+                    runner_results[res_idx]["valueGrade"] = "FAIR VALUE"
+                else:
+                    runner_results[res_idx]["valueGrade"] = "UNDERPRICED"
+
+                m_odds = effective_odds_map.get(r_num, 0.0)
+                if edge > 0.03 and m_odds > 1.0:
                     kelly = max(0.0, min(0.05, edge / (m_odds - 1.0)))
                     runner_results[res_idx]["kellyFraction"] = round(kelly, 4)
                 else:
@@ -444,6 +485,7 @@ def enrich_predictions_with_composite_score(
             else:
                 runner_results[res_idx]["valueEdge"] = None
                 runner_results[res_idx]["kellyFraction"] = None
+                runner_results[res_idx]["valueGrade"] = "Fair"
 
     # Rank active runners by compositeWinProbability
     active_runner_res = [r for r in runner_results if not r["isScratched"]]
@@ -452,15 +494,18 @@ def enrich_predictions_with_composite_score(
     for rank, item in enumerate(active_runner_res, start=1):
         item["compositeRank"] = rank
 
-    # Pick designations
+    # Top Pick & Value selections
     top_pick_name = active_runner_res[0]["mc_item"].get("runnerName", "") if active_runner_res else ""
     value_pick_name = mc_prediction.get("valuePickName", "")
     dark_horse_name = mc_prediction.get("darkHorseName", "")
+    best_underdog_name = mc_prediction.get("bestUnderdogName", value_pick_name)
+    best_longshot_name = mc_prediction.get("bestLongshotName", dark_horse_name)
 
-    # Check for highest value edge pick if available, otherwise dark horse / value
+    # Check for highest value edge pick if available
     for r in active_runner_res:
         if r.get("valueEdge") is not None and r["valueEdge"] > 0.05:
-            value_pick_name = r["mc_item"].get("runnerName", value_pick_name)
+            best_underdog_name = r["mc_item"].get("runnerName", best_underdog_name)
+            value_pick_name = best_underdog_name
             break
 
     # Build backward-compatible predictions array
@@ -475,11 +520,20 @@ def enrich_predictions_with_composite_score(
         merged_item["compositeScore"] = extra.get("compositeScore")
         merged_item["compositeWinProbability"] = extra.get("compositeWinProbability", 0.0)
         merged_item["compositePlaceProbability"] = extra.get("compositePlaceProbability", 0.0)
+        merged_item["compositeTop3Probability"] = extra.get("compositeTop3Probability", merged_item.get("top3Probability", 0.0))
         merged_item["compositeFairOdds"] = extra.get("compositeFairOdds")
         merged_item["compositeRank"] = extra.get("compositeRank")
         merged_item["subScores"] = extra.get("subScores")
-        merged_item["valueEdge"] = extra.get("valueEdge")
+        merged_item["valueEdge"] = extra.get("valueEdge") if extra.get("valueEdge") is not None else merged_item.get("valueEdge")
+        merged_item["valueGrade"] = extra.get("valueGrade", merged_item.get("valueGrade", "Fair"))
         merged_item["kellyFraction"] = extra.get("kellyFraction")
+
+        # Update horse card with enriched probabilities and verdicts
+        if "horseCard" in merged_item and isinstance(merged_item["horseCard"], dict):
+            if merged_item.get("compositeFairOdds"):
+                merged_item["horseCard"]["marketOdds"] = merged_item["compositeFairOdds"]
+            if merged_item.get("verdict"):
+                merged_item["horseCard"]["verdict"] = merged_item["verdict"]
 
         enriched_predictions_list.append(merged_item)
 
@@ -497,6 +551,9 @@ def enrich_predictions_with_composite_score(
     enriched_prediction_output["compositeTopPickName"] = top_pick_name
     enriched_prediction_output["compositeValuePickName"] = value_pick_name
     enriched_prediction_output["compositeDarkHorseName"] = dark_horse_name
+    enriched_prediction_output["bestUnderdogName"] = best_underdog_name
+    enriched_prediction_output["bestLongshotName"] = best_longshot_name
+    enriched_prediction_output["top3Candidates"] = [p["runnerName"] for p in enriched_predictions_list if not p.get("isScratched")][:3]
 
     # Log prediction for future backtesting
     log_prediction_for_backtest(form_data, enriched_prediction_output)

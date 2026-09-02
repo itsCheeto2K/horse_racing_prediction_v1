@@ -1,0 +1,1094 @@
+Được. Với bộ data kiểu mà bạn đang có, tôi khuyên bạn **không phân tích từng con ngựa một cách độc lập ngay từ đầu**. Cách tốt hơn là phân tích theo một pipeline cố định:
+
+**Race → Context → từng Horse → Race Map → Ranking → Value/Underdog → Top 3 prediction.**
+
+Mục tiêu là sau khi đọc một race, bạn có thể trả lời được 4 câu:
+
+1. Con nào **mạnh nhất về ability**?
+2. Con nào **phù hợp nhất với điều kiện cuộc đua**?
+3. Con nào **có khả năng Top 3 cao hơn thị trường nghĩ**?
+4. Nếu race chạy đúng kịch bản, **những con nào được hưởng lợi / bị bất lợi?**
+
+Dưới đây là quy trình A–Z tôi nghĩ phù hợp nhất để bạn vừa phân tích thủ công, vừa chuyển thành logic cho C++ engine.
+
+---
+
+# 1. Bước 1 — Đọc thông tin tổng quan của race
+
+Trước khi nhìn từng horse, đọc:
+
+* Distance
+* Track
+* Going
+* Race class
+* Field size
+* Prize money
+* Age/sex restrictions
+* Weight conditions
+* Barrier distribution
+* Odds toàn field
+
+Ví dụ:
+
+> 1400m — Good 4 — 13 runners
+
+Ngay lập tức bạn có một "race profile".
+
+### Distance
+
+1400m không giống 1000m hay 2000m.
+
+Với 1400m, bạn quan tâm nhiều đến:
+
+* khả năng giữ tốc độ
+* tactical speed
+* khả năng chuyển tốc cuối race
+* stamina vừa đủ
+* running position
+* khả năng chịu pressure
+
+Không nhất thiết horse chạy 1400m trước đó mới phù hợp.
+
+---
+
+# 2. Bước 2 — Đánh giá field strength
+
+Đây là bước rất quan trọng nhưng thường bị bỏ qua.
+
+Đừng chỉ hỏi:
+
+> "Có bao nhiêu con?"
+
+Mà hỏi:
+
+> "Có bao nhiêu con thực sự có khả năng thắng/Top 3?"
+
+Ví dụ:
+
+| Horse |  Odds | Ability |
+| ----- | ----: | ------- |
+| A     | $2.50 | ★★★★★   |
+| B     | $4.50 | ★★★★    |
+| C     |    $6 | ★★★★    |
+| D     |    $8 | ★★★     |
+| E     |   $15 | ★★★     |
+| F     |   $25 | ★★      |
+| G     |   $40 | ★       |
+| H     |   $50 | ★       |
+| I     |   $80 | ★       |
+| J     |  $100 | ★       |
+| K     |  $150 | ★       |
+| L     |  $200 | ★       |
+| M     |  $300 | ★       |
+
+13 runners nhưng có thể chỉ có **4–5 con thực sự cạnh tranh Top 3**.
+
+Đây là thứ tôi gọi là:
+
+**Effective Competitive Field**
+
+Nó quan trọng hơn raw field size.
+
+---
+
+# 3. Bước 3 — Chia toàn bộ field thành 4 nhóm
+
+Trước khi phân tích sâu, chia:
+
+### Tier A — Main contenders
+
+Khả năng thắng/Top 3 cao.
+
+Ví dụ:
+
+> $2–$6
+
+### Tier B — Secondary contenders
+
+Có khả năng Top 3 nhưng chưa đủ mạnh để gọi là favourite.
+
+> $6–$12
+
+### Tier C — Value underdogs
+
+Odds tương đối cao nhưng data có dấu hiệu tốt.
+
+> $10–$25
+
+### Tier D — Longshots
+
+Odds cao và data cũng yếu.
+
+> $30+
+
+Điểm quan trọng:
+
+**Tier C ≠ Tier D.**
+
+Đây chính là chỗ engine của bạn nên tìm value.
+
+---
+
+# 4. Bước 4 — Phân tích từng horse
+
+Đây là phần quan trọng nhất.
+
+Tôi khuyên bạn dùng **10 câu hỏi cố định** cho MỖI horse.
+
+Đừng nhìn data lung tung.
+
+Mỗi horse đi qua cùng một checklist.
+
+---
+
+## 4.1. Horse Ability
+
+Đầu tiên hỏi:
+
+> "Con này thực sự giỏi đến đâu?"
+
+Dùng:
+
+* RTG
+* recent form
+* career record
+* place %
+* class
+* quality of races
+* beaten margin
+
+Ví dụ:
+
+**Horse A**
+
+> RTG 63
+> Last 5: 2-3-1-4-2
+> Place% 60%
+
+→ Ability rất tốt.
+
+**Horse B**
+
+> RTG 58
+> Last 5: 9-7-8-6-10
+> Place% 10%
+
+→ Ability yếu.
+
+Đây là **base ability**.
+
+Chưa cần nhìn odds.
+
+---
+
+# 5. Phân tích Recent Form
+
+Đây là phần bạn nên đào sâu nhất.
+
+Đừng làm:
+
+> Last start = 6th → form xấu.
+
+Sai.
+
+Bạn phải đọc:
+
+**Position + Margin + Race shape + Running position + Trouble**
+
+Ví dụ:
+
+### Horse X
+
+Last start:
+
+> 6th, beaten 2.2L
+
+Nhìn bề ngoài:
+
+> ❌ 6th
+
+Nhưng nếu:
+
+> led → đi quá nhanh → bị bắt cuối race → beaten 2.2L
+
+thì câu chuyện hoàn toàn khác.
+
+Có thể:
+
+> Form = neutral/positive.
+
+Ngược lại:
+
+### Horse Y
+
+> 3rd, beaten 0.4L
+
+Nhưng:
+
+> leaders đi chậm → horse chạy 2nd → được run cực đẹp → không thể vượt
+
+thì 3rd chưa chắc mạnh.
+
+---
+
+# 6. Chấm Recent Run theo 5 thành phần
+
+Bạn có thể biến nó thành:
+
+```text
+RecentRunScore =
+    FinishPosition
+  + BeatenMargin
+  + RunningPosition
+  + RaceShape
+  + Trouble
+```
+
+Ví dụ:
+
+| Factor           | Horse A |
+| ---------------- | ------: |
+| Finish           |      +6 |
+| Margin           |      +8 |
+| Running position |      +5 |
+| Race shape       |      +3 |
+| Trouble          |      +2 |
+| Total            |      24 |
+
+Horse B:
+
+| Factor           | Horse B |
+| ---------------- | ------: |
+| Finish           |      +3 |
+| Margin           |      +7 |
+| Running position |      -2 |
+| Race shape       |      -3 |
+| Trouble          |       0 |
+| Total            |       5 |
+
+Mặc dù A và B có thể cùng finish 3rd, chất lượng run khác nhau rất nhiều.
+
+---
+
+# 7. Beaten Margin
+
+Đây là data cực kỳ đáng giá.
+
+Ví dụ:
+
+> 5th beaten 0.8L
+
+có thể tốt hơn:
+
+> 2nd beaten 2.5L
+
+Đặc biệt nếu race có nhiều runners.
+
+Bạn nên chuẩn hóa margin theo:
+
+* distance
+* race class
+* field strength
+
+Ví dụ đơn giản:
+
+```text
+MarginScore = exp(-margin / K)
+```
+
+Trong đó `K` phụ thuộc distance.
+
+---
+
+# 8. Distance Fit
+
+Đây là nơi model của bạn cần sửa một lỗi tư duy phổ biến.
+
+Không được:
+
+```text
+0 previous starts at 1400m
+= negative
+```
+
+Phải chia thành:
+
+### Proven
+
+Đã chạy tốt ở distance.
+
+→ Positive mạnh.
+
+### Untested
+
+Chưa chạy nhưng:
+
+* pedigree phù hợp
+* running style phù hợp
+* recent 1200m run tốt
+* stamina có dấu hiệu tốt
+
+→ Neutral / slight positive.
+
+### Proven unsuitable
+
+Đã chạy 1400m nhiều lần nhưng thường fade.
+
+→ Negative.
+
+Ví dụ Wrexham trong race 1400m:
+
+> chạy 1200m → 3rd → beaten 0.68L
+
+Nếu race đó cho thấy horse vẫn giữ tốc độ cuối race tốt:
+
+**1200 → 1400 có thể là positive.**
+
+Không nên phạt vì:
+
+> Distance starts = 0.
+
+---
+
+# 9. Track & Going
+
+Sau distance là:
+
+**Track + Ground**
+
+Ví dụ:
+
+> Good 4
+
+Bạn kiểm tra:
+
+* Good record
+* Track record
+* Track & distance
+* Recent run on Good
+* Pedigree nếu available
+
+Nhưng phải tránh overfit.
+
+Ví dụ:
+
+> Good: 1 start, 1 win
+
+Không có nghĩa:
+
+> Good affinity = cực cao.
+
+Sample size quá nhỏ.
+
+Có thể dùng Bayesian shrinkage:
+
+```text
+AdjustedRate =
+(wins + priorWins) /
+(starts + priorStarts)
+```
+
+Cách này rất phù hợp cho engine của bạn.
+
+---
+
+# 10. Race Distance × Going
+
+Đừng chỉ xét:
+
+```text
+DistanceScore
+GoingScore
+```
+
+Hãy có:
+
+```text
+DistanceGoingScore
+```
+
+Ví dụ:
+
+Horse A:
+
+> 1200m Soft5 tốt
+> 1400m Good4 chưa thử
+
+Horse B:
+
+> 1400m Good4 tốt
+
+Horse B rõ ràng có evidence mạnh hơn.
+
+Nhưng A không nhất thiết bị loại.
+
+---
+
+# 11. Barrier
+
+Barrier không phải:
+
+> Barrier 1 = tốt
+> Barrier 17 = xấu.
+
+Nó phụ thuộc:
+
+* distance
+* track
+* field size
+* running style
+* pace
+* race map
+
+Ví dụ:
+
+**1400m — 13 runners**
+
+Barrier 10 không nhất thiết thảm họa.
+
+Nhưng:
+
+**1400m — 18 runners**
+
+Barrier 17 có thể đáng phạt nhiều hơn.
+
+Vì vậy:
+
+```text
+BarrierPenalty =
+f(distance, field_size, track, running_style)
+```
+
+chứ không phải:
+
+```text
+BarrierPenalty = fixed number
+```
+
+---
+
+# 12. Race Map
+
+Đây là bước tôi đặc biệt khuyên bạn thêm vào model.
+
+Phân loại horse:
+
+```text
+Leader
+On-pace
+Midfield
+Backmarker
+```
+
+Sau đó xem cả field.
+
+Ví dụ:
+
+```text
+A → Leader
+B → Leader
+C → On pace
+D → Leader
+E → Midfield
+F → Midfield
+G → Backmarker
+```
+
+Có **3–4 leader**.
+
+Khả năng:
+
+> Pace rất nhanh.
+
+Khi đó:
+
+**Backmarker / strong closer**
+
+có thể hưởng lợi.
+
+Ngược lại:
+
+Nếu chỉ có một leader:
+
+```text
+A → Leader
+B → Midfield
+C → Midfield
+D → Back
+```
+
+thì:
+
+> A có khả năng kiểm soát race.
+
+A được cộng điểm.
+
+---
+
+# 13. Đây là lúc phân tích "race shape"
+
+Đừng phân tích horse trong chân không.
+
+Bạn phải hỏi:
+
+> "Horse này cần race chạy như thế nào để nó đạt Top 3?"
+
+Ví dụ Wrexham:
+
+```text
+Nếu pace nhanh
+→ có thể hưởng lợi
+
+Nếu pace vừa/chậm
+→ cần position tốt hơn
+```
+
+Damage Control:
+
+```text
+Nếu được chạy gần front
+→ tốt
+
+Nếu bị ép pace
+→ risk fade
+```
+
+Một horse có thể:
+
+> Ability 8/10
+
+nhưng:
+
+> Race-shape fit 5/10.
+
+Tổng thể chưa chắc tốt.
+
+---
+
+# 14. Jockey + Trainer
+
+Không nên để weight quá cao.
+
+Bạn đang dùng:
+
+> 15%
+
+Tôi thấy hợp lý.
+
+Kiểm tra:
+
+* jockey strike rate
+* trainer form
+* jockey/trainer combination
+* recent stable form
+
+Nhưng đừng để:
+
+> jockey nổi tiếng
+
+lấn át horse ability.
+
+Ví dụ:
+
+Horse yếu + jockey elite
+
+không tự động trở thành contender.
+
+---
+
+# 15. Weight
+
+Weight nên được xét cùng:
+
+* horse size/profile nếu có
+* previous weight
+* recent performance
+* distance
+* class
+
+Ví dụ:
+
+```text
+58kg → không tự động xấu
+55kg → không tự động tốt
+```
+
+Điều quan trọng hơn:
+
+> Horse này đã chạy tốt với mức weight tương tự chưa?
+
+---
+
+# 16. Odds — CHỈ XEM SAU KHI PHÂN TÍCH HORSE
+
+Đây là nguyên tắc rất quan trọng cho model của bạn.
+
+Trình tự:
+
+```text
+Horse Ability
+      ↓
+Recent Form
+      ↓
+Distance
+      ↓
+Going
+      ↓
+Barrier
+      ↓
+Race Map
+      ↓
+Jockey/Trainer
+      ↓
+Weight
+      ↓
+Model Probability
+      ↓
+MARKET ODDS
+```
+
+Không nên:
+
+```text
+$25 → chắc yếu
+$3 → chắc mạnh
+```
+
+---
+
+# 17. Sau khi phân tích xong mới nhìn Market
+
+Giả sử:
+
+Horse A:
+
+> Model Top 3 = 32%
+
+Odds:
+
+> $8
+
+Market implied probability:
+
+```text
+1 / 8 = 12.5%
+```
+
+Model:
+
+```text
+32%
+```
+
+Edge:
+
+```text
+32 - 12.5 = +19.5%
+```
+
+Đây là **value**.
+
+---
+
+# 18. Nhưng phải normalize market probability
+
+Vì odds có overround.
+
+Ví dụ:
+
+```text
+A = $3
+B = $4
+C = $5
+D = $8
+E = $10
+...
+```
+
+Tính:
+
+```text
+Pmarket = 1 / odds
+```
+
+sau đó normalize:
+
+```text
+Pnormal =
+Pmarket / ΣPmarket
+```
+
+Như vậy market probability hợp lý hơn.
+
+---
+
+# 19. Monte Carlo của bạn nằm ở cuối pipeline
+
+Đây là chỗ hệ thống hiện tại của bạn rất hợp.
+
+Ví dụ mỗi horse có:
+
+```text
+AbilityScore
+FormScore
+TrackScore
+DistanceScore
+JockeyScore
+BarrierScore
+RaceMapScore
+```
+
+Sau đó:
+
+```text
+BaseScore
+      ↓
+Race-condition adjustment
+      ↓
+Race-map adjustment
+      ↓
+Monte Carlo
+      ↓
+Win %
+Top 3 %
+Top 5 %
+```
+
+Ví dụ:
+
+| Horse | Win | Top 3 | Odds |
+| ----- | --: | ----: | ---: |
+| A     | 31% |   65% | $2.8 |
+| B     | 20% |   52% |   $4 |
+| C     | 11% |   34% |   $7 |
+| D     |  7% |   28% |  $10 |
+| E     |  3% |   21% |  $18 |
+| F     |  1% |   15% |  $30 |
+
+Nếu mục tiêu là **underdog Top 3**:
+
+C/D/E/F mới đáng nghiên cứu.
+
+---
+
+# 20. Tách "Ability" và "Value"
+
+Đây là kiến trúc tôi khuyên bạn áp dụng.
+
+Không dùng một score duy nhất.
+
+Có ít nhất 3 score:
+
+```text
+ABILITY SCORE
+```
+
+Horse mạnh đến đâu?
+
+```text
+TOP3 PROBABILITY
+```
+
+Khả năng thực tế đạt Top 3?
+
+```text
+VALUE SCORE
+```
+
+Thị trường đang đánh giá thấp horse đến mức nào?
+
+Ví dụ:
+
+### Horse A
+
+```text
+Ability = 92
+Top3 = 65%
+Odds = $2.5
+Value = low
+```
+
+### Horse B
+
+```text
+Ability = 78
+Top3 = 32%
+Odds = $8
+Value = high
+```
+
+### Horse C
+
+```text
+Ability = 55
+Top3 = 12%
+Odds = $40
+Value = low
+```
+
+Horse B mới là **value underdog**.
+
+---
+
+# 21. Cuối cùng mới đưa ra Race Ranking
+
+Tôi khuyên output cuối cùng của engine có dạng:
+
+```text
+#1 Main Contender
+Horse A
+
+#2 Main Contender
+Horse B
+
+#3 Value
+Horse C
+
+#4 Value
+Horse D
+
+#5 Outsider
+Horse E
+```
+
+Và đặc biệt:
+
+```text
+Top 3 Candidates
+1. A
+2. B
+3. C
+
+Best Underdog
+C
+
+Best Longshot
+D
+```
+
+---
+
+# 22. Với từng horse, bạn nên tạo một "Horse Card"
+
+Đây là format rất tốt để bạn đọc race.
+
+Ví dụ:
+
+```text
+WREXHAM #3
+
+Odds: $23
+Barrier: 10
+Weight: 58kg
+RTG: 58
+
+ABILITY
+★★★★☆
+Recent form: Positive
+
+RECENT RUN
+3rd
+Beaten: 0.68L
+Distance: 1200m
+Going: Soft5
+
+Interpretation:
+Close 3rd, competitive late.
+Suggests current fitness.
+
+DISTANCE
+1400m: Untested
+1200m evidence: Positive
+→ Potential distance progression
+
+TRACK / GOING
+Good4: Limited evidence
+→ Neutral
+
+BARRIER
+10/13
+→ Slight negative
+
+RACE MAP
+Likely midfield
+→ Depends on pace
+
+JOCKEY/TRAINER
+Neutral / Positive
+
+OVERALL
+Ability: 7.0/10
+Race Fit: 7.2/10
+Risk: Medium
+
+MARKET
+Odds: $23
+
+VERDICT:
+VALUE UNDERDOG
+```
+
+Đây là cách rất tốt để tránh việc nhìn data rồi "cảm giác" horse nào ngon.
+
+---
+
+# 23. Tôi sẽ chia toàn bộ quá trình thành 4 tầng
+
+Đây mới là framework tôi nghĩ bạn nên đưa vào project.
+
+### Tầng 1 — Horse Ability
+
+```text
+Form
+Class
+RTG
+Margins
+Career
+```
+
+→ "Horse mạnh không?"
+
+### Tầng 2 — Race Fit
+
+```text
+Distance
+Going
+Track
+Weight
+Barrier
+Race Map
+```
+
+→ "Horse này có hợp race không?"
+
+### Tầng 3 — Race Dynamics
+
+```text
+Pace
+Leaders
+On-pace
+Backmarkers
+Field strength
+Traffic risk
+```
+
+→ "Race sẽ diễn biến thế nào?"
+
+### Tầng 4 — Market Value
+
+```text
+Odds
+Market Probability
+Model Probability
+Edge
+```
+
+→ "Có bị market đánh giá thấp không?"
+
+---
+
+# 24. Và đây là thứ tự phân tích A → Z hoàn chỉnh
+
+Khi bạn mở một race mới, cứ làm đúng thứ tự này:
+
+```text
+1. Race conditions
+        ↓
+2. Distance
+        ↓
+3. Going
+        ↓
+4. Field size
+        ↓
+5. Field strength
+        ↓
+6. Market overview
+        ↓
+7. Horse-by-horse analysis
+        ↓
+8. Recent form
+        ↓
+9. Beaten margin
+        ↓
+10. Running position
+        ↓
+11. Race shape
+        ↓
+12. Distance fit
+        ↓
+13. Track/Going
+        ↓
+14. Weight
+        ↓
+15. Barrier
+        ↓
+16. Jockey/Trainer
+        ↓
+17. Race Map
+        ↓
+18. Ability Score
+        ↓
+19. Race Fit Score
+        ↓
+20. Monte Carlo
+        ↓
+21. Model Top-3 %
+        ↓
+22. Market implied %
+        ↓
+23. Value Edge
+        ↓
+24. Rank
+        ↓
+25. Select Top 3
+        ↓
+26. Select Best Underdog
+```
+
+---
+
+# 25. Một điểm rất quan trọng cho project của bạn
+
+Nếu mục tiêu chính của website là **dự đoán Top 3**, tôi sẽ không để 5 trọng số hiện tại hoạt động độc lập như:
+
+```text
+Form 25%
+Track 25%
+Distance 20%
+Jockey 15%
+Barrier 15%
+```
+
+Mà nên chuyển sang kiến trúc:
+
+```text
+                HORSE ABILITY
+                     │
+        ┌────────────┼────────────┐
+        ↓            ↓            ↓
+      FORM         CLASS         RTG
+        │
+        ↓
+               RACE FIT
+        ┌───────┼───────┐
+        ↓       ↓       ↓
+    Distance  Going   Barrier
+        │       │       │
+        └───────┼───────┘
+                ↓
+             RACE MAP
+                ↓
+          PACE SIMULATION
+                ↓
+          MONTE CARLO
+                ↓
+        ┌───────┴────────┐
+        ↓                ↓
+     WIN %             TOP3 %
+                           │
+                           ↓
+                     MARKET ODDS
+                           │
+                           ↓
+                      VALUE EDGE
+```

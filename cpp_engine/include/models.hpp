@@ -144,6 +144,30 @@ public:
     std::vector<Runner> getActiveRunners() const;
 };
 
+// Running style classifications for Race Map
+enum class RunningStyle {
+    Leader,       // Front-runner / pacesetter
+    OnPace,       // Handily placed / prominent (2nd - 4th)
+    Midfield,     // Midfield tracker (5th - 8th)
+    Backmarker    // Closer / Get-back runner (9th+)
+};
+
+// 4-Tier field classification
+enum class ContenderTier {
+    TierA_MainContender,       // $2 - $6
+    TierB_SecondaryContender,  // $6 - $12
+    TierC_ValueUnderdog,       // $10 - $25 with strong data signals
+    TierD_Longshot             // $30+ outsider
+};
+
+// Distance fit categorization
+enum class DistanceFitCategory {
+    Proven,            // Strong evidence at distance
+    UntestedPositive,  // Untested but positive stepping-stone momentum (e.g. good 1200m -> 1400m)
+    UntestedNeutral,   // Untested general
+    Unsuitable         // Poor record at distance, known fader
+};
+
 // Configurable weights for the OOP composite model
 struct ModelWeights {
     double formWeight = 0.25;
@@ -151,6 +175,11 @@ struct ModelWeights {
     double distanceWeight = 0.20;
     double jockeyTrainerWeight = 0.15;
     double barrierWeight = 0.15;
+
+    // 4-Tier layer weights
+    double abilityLayerWeight = 0.45;
+    double raceFitLayerWeight = 0.35;
+    double raceMapLayerWeight = 0.20;
 
     static ModelWeights fromJson(const json& j);
     json toJson() const;
@@ -170,6 +199,77 @@ struct FeatureScores {
     double barrierScore = 0.0;
     double compositeRating = 0.0;
 
+    // 4-Tier scores
+    double abilityScore = 0.0;
+    double raceFitScore = 0.0;
+    double raceMapScore = 0.0;
+
+    json toJson() const;
+};
+
+// Detailed Horse Card matching Section 22 in new_feat.txt
+struct HorseCardData {
+    std::string runnerName;
+    int runnerNumber = 0;
+    int barrier = 0;
+    double weight = 0.0;
+    std::string rtg = "N/A";
+    
+    // Ability section
+    int abilityStars = 3; // 1-5
+    std::string recentFormVerdict = "Neutral";
+    
+    // Recent run section
+    std::string recentRunPosition = "-";
+    std::string recentRunMargin = "-";
+    std::string recentRunDistance = "-";
+    std::string recentRunGoing = "-";
+    std::string recentRunInterpretation;
+    
+    // Distance section
+    std::string distanceStatus;      // "Proven", "Untested Positive", "Neutral", "Unsuitable"
+    std::string distanceEvidence;
+    
+    // Track / Going section
+    std::string trackGoingStatus;
+    std::string trackGoingEvidence;
+    
+    // Barrier section
+    std::string barrierAssessment;
+    
+    // Race Map & Pace section
+    std::string runningStyle;        // "Leader", "On-pace", "Midfield", "Backmarker"
+    std::string paceFit;
+    
+    // Jockey & Trainer section
+    std::string jockeyTrainerStatus;
+    
+    // Overall scores (0.0 - 10.0 scale)
+    double abilityRating10 = 5.0;
+    double raceFitRating10 = 5.0;
+    std::string riskLevel = "Medium";
+    
+    // Market & Verdict
+    double marketOdds = 0.0;
+    std::string verdict;             // "MAIN CONTENDER", "SECONDARY CONTENDER", "VALUE UNDERDOG", "LONGSHOT"
+
+    json toJson() const;
+};
+
+// Race Map and Pace Dynamics Summary
+struct RaceMapSummary {
+    std::string paceScenario = "Moderate / True Pace"; // "Fast / Contested Pace", "Moderate / True Pace", "Slow / Tactical Pace"
+    std::string paceDescription;
+    int leaderCount = 0;
+    int onPaceCount = 0;
+    int midfieldCount = 0;
+    int backmarkerCount = 0;
+    int effectiveFieldCount = 0;
+    std::vector<std::string> leaders;
+    std::vector<std::string> onPaceRunners;
+    std::vector<std::string> midfieldRunners;
+    std::vector<std::string> backmarkers;
+
     json toJson() const;
 };
 
@@ -185,12 +285,30 @@ struct RunnerPrediction {
     double powerRating = 0.0;
     double winProbability = 0.0;
     double placeProbability = 0.0;
+    double top3Probability = 0.0;
+    double top5Probability = 0.0;
     double fairOdds = 0.0;
+    
+    // 4-Tier attributes
+    double abilityScore = 0.0;
+    double raceFitScore = 0.0;
+    double raceMapScore = 0.0;
+    std::string runningStyle = "Midfield";
+    std::string tier = "Tier B - Secondary";
+    std::string verdict = "CONTENDER";
+    std::string riskLevel = "Medium";
+    double valueEdge = 0.0;
+    std::string valueGrade = "Fair";
+    
     FeatureScores featureScores;
     std::vector<std::string> badges;
+    HorseCardData horseCard;
+    
     bool isTopPick = false;
     bool isValuePick = false;
     bool isDarkHorse = false;
+    bool isBestUnderdog = false;
+    bool isBestLongshot = false;
     bool isScratched = false;
 
     json toJson() const;
@@ -208,12 +326,19 @@ struct RacePredictionResult {
     int totalSimulations = 10000;
     bool isDynamicWeights = false;
     ModelWeights appliedWeights;
-    std::vector<RunnerPrediction> runnerPredictions;
+    
+    RaceMapSummary raceMap;
+    std::vector<std::string> top3Candidates;
     std::string topPickName;
     std::string valuePickName;
     std::string darkHorseName;
+    std::string bestUnderdogName;
+    std::string bestLongshotName;
+    
+    std::vector<RunnerPrediction> runnerPredictions;
 
     json toJson() const;
 };
 
 } // namespace HorseRacing
+

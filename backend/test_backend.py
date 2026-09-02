@@ -108,6 +108,8 @@ class TestHorseRacingBackend(unittest.TestCase):
         self.assertIn("predictions", enriched)
         self.assertIn("compositeWeights", enriched)
         self.assertIn("compositeTopPickName", enriched)
+        self.assertIn("top3Candidates", enriched)
+        self.assertIn("raceMap", enriched)
 
         preds = enriched["predictions"]
         self.assertEqual(len(preds), len(self.test_race_form["runners"]))
@@ -124,16 +126,41 @@ class TestHorseRacingBackend(unittest.TestCase):
         total_active_prob = sum(p["compositeWinProbability"] for p in active_preds)
         self.assertAlmostEqual(total_active_prob, 1.0, places=2)
 
-        # Check subScores breakdown is present
+        # Check 4-Tier metrics and subScores breakdown
         for ap in active_preds:
             self.assertIsNotNone(ap["subScores"])
             self.assertIn("monteCarloScore", ap["subScores"])
             self.assertIn("recentFormScore", ap["subScores"])
             self.assertIn("classScore", ap["subScores"])
-            self.assertIn("consistencyScore", ap["subScores"])
+            self.assertIn("abilityScore", ap)
+            self.assertIn("raceFitScore", ap)
+            self.assertIn("runningStyle", ap)
+            self.assertIn("horseCard", ap)
+            self.assertIn("verdict", ap)
             self.assertGreater(ap["compositeFairOdds"], 1.0)
 
-        print(f"[TEST PASS] Composite ensemble probabilities sum = {total_active_prob:.4f}. Top Pick: {enriched['compositeTopPickName']}")
+        # Check Top 3 Candidates
+        self.assertEqual(len(enriched["top3Candidates"]), 3)
+        print(f"[TEST PASS] 4-Tier Pipeline & Top 3 Candidates verified. Top 3: {enriched['top3Candidates']}. Pace: {enriched['raceMap']['paceScenario']}")
+
+    def test_market_odds_and_value_edge(self):
+        mc_res = self.engine.predict_race(self.test_race_form, simulations=2000)
+        custom_market_odds = {
+            2: 2.50,  # Valley Prince
+            3: 8.00,  # Cours Vite (Value Underdog scenario)
+            4: 4.50,  # Nasha
+            5: 35.00  # Denuto
+        }
+        enriched = enrich_predictions_with_composite_score(
+            self.test_race_form,
+            mc_res,
+            market_odds_map=custom_market_odds
+        )
+        preds = enriched["predictions"]
+        cours_vite = next(p for p in preds if p["runnerNumber"] == 3)
+        self.assertIsNotNone(cours_vite.get("valueEdge"))
+        self.assertIn(cours_vite.get("valueGrade"), ["HIGH VALUE", "POSITIVE VALUE", "FAIR VALUE", "UNDERPRICED"])
+        print(f"[TEST PASS] Market Odds normalization & Value Edge verified for Cours Vite: Edge={cours_vite['valueEdge']}, Grade={cours_vite['valueGrade']}")
 
 
 if __name__ == "__main__":
