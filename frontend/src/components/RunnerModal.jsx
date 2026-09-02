@@ -114,10 +114,17 @@ export default function RunnerModal({ runner, prediction, onClose }) {
 
           {/* Card Section 2: RECENT RUN INTERPRETATION */}
           <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2.5">
-            <h3 className="text-xs font-mono uppercase tracking-wider text-sky-400 font-bold flex items-center gap-1.5">
-              <Activity className="w-4 h-4 text-sky-400" />
-              2. Recent Start Breakdown & Interpretation
-            </h3>
+            <div className="flex items-center justify-between flex-wrap gap-1">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-sky-400 font-bold flex items-center gap-1.5">
+                <Activity className="w-4 h-4 text-sky-400" />
+                2. Recent Start Breakdown & Interpretation
+              </h3>
+              {(card.recentRunCourse || card.recentRunDate) && (
+                <span className="text-[11px] font-mono text-amber-300/90 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                  {card.recentRunCourse} {card.recentRunDate ? `• ${card.recentRunDate}` : ''}
+                </span>
+              )}
+            </div>
             
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono text-center">
               <div className="bg-slate-800/60 p-2 rounded-lg border border-slate-700/40">

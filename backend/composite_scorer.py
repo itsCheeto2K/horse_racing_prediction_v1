@@ -512,6 +512,22 @@ def enrich_predictions_with_composite_score(
     enriched_predictions_list = []
     res_map_by_num = {r["runnerNumber"]: r for r in runner_results}
 
+    # Enrich with real past performance from Sporting Life open API if available
+    try:
+        from sporting_life_client import sporting_life_enricher, clean_name
+        race_date = form_data.get("date", "")
+        track_name = form_data.get("track", "")
+        race_number = int(form_data.get("raceNumber", 1))
+        sl_enriched_map = sporting_life_enricher.enrich_race_runners(
+            date_str=race_date,
+            track_name=track_name,
+            race_number=race_number,
+            runners=runners
+        )
+    except Exception as e:
+        logger.debug(f"Sporting Life enrichment skipped: {e}")
+        sl_enriched_map = {}
+
     for mc_item in mc_preds:
         num = mc_item.get("runnerNumber")
         extra = res_map_by_num.get(num, {})
@@ -528,12 +544,33 @@ def enrich_predictions_with_composite_score(
         merged_item["valueGrade"] = extra.get("valueGrade", merged_item.get("valueGrade", "Fair"))
         merged_item["kellyFraction"] = extra.get("kellyFraction")
 
-        # Update horse card with enriched probabilities and verdicts
+        # Update horse card with enriched probabilities, verdicts, and real past performances
         if "horseCard" in merged_item and isinstance(merged_item["horseCard"], dict):
             if merged_item.get("compositeFairOdds"):
                 merged_item["horseCard"]["marketOdds"] = merged_item["compositeFairOdds"]
             if merged_item.get("verdict"):
                 merged_item["horseCard"]["verdict"] = merged_item["verdict"]
+
+            # Merge real past performance from Sporting Life if available
+            try:
+                from sporting_life_client import clean_name
+                r_name_clean = clean_name(merged_item.get("runnerName", ""))
+                if r_name_clean in sl_enriched_map:
+                    real_run = sl_enriched_map[r_name_clean]
+                    if real_run.get("recentRunPosition"):
+                        merged_item["horseCard"]["recentRunPosition"] = real_run["recentRunPosition"]
+                    if real_run.get("recentRunDistance"):
+                        merged_item["horseCard"]["recentRunDistance"] = real_run["recentRunDistance"]
+                    if real_run.get("recentRunGoing"):
+                        merged_item["horseCard"]["recentRunGoing"] = real_run["recentRunGoing"]
+                    if real_run.get("recentRunCourse"):
+                        merged_item["horseCard"]["recentRunCourse"] = real_run["recentRunCourse"]
+                    if real_run.get("recentRunDate"):
+                        merged_item["horseCard"]["recentRunDate"] = real_run["recentRunDate"]
+                    if real_run.get("recentRunDescription"):
+                        merged_item["horseCard"]["recentRunInterpretation"] = real_run["recentRunDescription"]
+            except Exception:
+                pass
 
         enriched_predictions_list.append(merged_item)
 
