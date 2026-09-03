@@ -7,7 +7,17 @@ import PredictionMatrix from './components/PredictionMatrix';
 import ModelTuner from './components/ModelTuner';
 import RunnerModal from './components/RunnerModal';
 import MonteCarloStats from './components/MonteCarloStats';
-import { fetchHealth, fetchMeetings, fetchRaceAndPrediction, simulateCustomWeights } from './services/api';
+import AIAnalystPanel from './components/AIAnalystPanel';
+import PostRaceLearningModal from './components/PostRaceLearningModal';
+import AIMemoryModal from './components/AIMemoryModal';
+import { 
+  fetchHealth, 
+  fetchMeetings, 
+  fetchRaceAndPrediction, 
+  simulateCustomWeights,
+  analyzeRaceWithAI,
+  fetchAIMemory
+} from './services/api';
 import { AlertCircle, RefreshCw, Layers } from 'lucide-react';
 
 export default function App() {
@@ -29,11 +39,28 @@ export default function App() {
   const [modalRunner, setModalRunner] = useState(null);
   const [modalPrediction, setModalPrediction] = useState(null);
 
+  // AI Analyst state
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [isPostRaceModalOpen, setIsPostRaceModalOpen] = useState(false);
+  const [isMemoryModalOpen, setIsMemoryModalOpen] = useState(false);
+  const [memoryCount, setMemoryCount] = useState(0);
+
+  // Load memory count on mount
+  const refreshMemoryCount = () => {
+    fetchAIMemory()
+      .then((data) => {
+        setMemoryCount(data.lessons?.length || 0);
+      })
+      .catch((err) => console.warn('Could not load memory count:', err));
+  };
+
   // Check backend health on mount
   useEffect(() => {
     fetchHealth()
       .then(setHealthStatus)
       .catch((err) => console.warn('Health check warning:', err));
+    refreshMemoryCount();
   }, []);
 
   // Load meetings when date or raceCode changes
@@ -102,9 +129,99 @@ export default function App() {
     return () => { isCancelled = true; };
   }, [selectedMeeting, selectedRaceNumber, selectedDate, raceCode]);
 
+  // Reset AI analysis when switching races
+  useEffect(() => {
+    setAiAnalysis(null);
+  }, [selectedMeeting, selectedRaceNumber, selectedDate]);
+
   const handleSelectRace = (meeting, raceNumber) => {
     setSelectedMeeting(meeting);
     setSelectedRaceNumber(raceNumber);
+  };
+
+  const handleGenerateAI = async () => {
+    if (!raceData || !raceData.form || !raceData.prediction) return;
+    setIsLoadingAI(true);
+    try {
+      const res = await analyzeRaceWithAI(raceData.form, raceData.prediction);
+      setAiAnalysis(res);
+
+      // Map AI calibrated formula scores and interpretations directly into the main prediction table
+      if (raceData.prediction?.predictions) {
+        const calibratedMap = {};
+        if (res.calibratedRunners && Array.isArray(res.calibratedRunners)) {
+          res.calibratedRunners.forEach((cr) => {
+            if (cr.runnerName) calibratedMap[cr.runnerName.toLowerCase()] = cr;
+            if (cr.runnerNumber) calibratedMap[cr.runnerNumber] = cr;
+          });
+        }
+
+        const enrichedPredictions = raceData.prediction.predictions.map((p) => {
+          const aiData = res.runnerInterpretations?.[p.runnerName];
+          const cal = calibratedMap[p.runnerName?.toLowerCase()] || calibratedMap[p.runnerNumber];
+
+          let updated = { ...p };
+
+          if (cal) {
+            const winProb = cal.compositeWinProbability !== undefined ? cal.compositeWinProbability : p.compositeWinProbability;
+            const fairOdds = cal.compositeFairOdds || (winProb > 0 ? Number((1 / winProb).toFixed(2)) : p.compositeFairOdds);
+            const marketOdds = p.marketOdds || fairOdds;
+            const valueEdge = (marketOdds && winProb) ? Number(((marketOdds * winProb) - 1).toFixed(4)) : p.valueEdge;
+
+            updated = {
+              ...updated,
+              compositeWinProbability: winProb,
+              winProbability: winProb,
+              compositePlaceProbability: cal.compositePlaceProbability !== undefined ? cal.compositePlaceProbability : p.compositePlaceProbability,
+              placeProbability: cal.compositePlaceProbability !== undefined ? cal.compositePlaceProbability : p.placeProbability,
+              compositeFairOdds: fairOdds,
+              fairOdds: fairOdds,
+              compositeRank: cal.compositeRank !== undefined ? cal.compositeRank : p.compositeRank,
+              rank: cal.compositeRank !== undefined ? cal.compositeRank : p.rank,
+              tier: cal.tier || p.tier,
+              verdict: cal.verdict || p.verdict,
+              valueEdge: valueEdge,
+              valueGrade: valueEdge > 0.15 ? 'High Value' : valueEdge > 0.05 ? 'Good Value' : 'Fair',
+              subScores: cal.subScores ? { ...p.subScores, ...cal.subScores } : p.subScores,
+              isAICalibrated: true
+            };
+          }
+
+          if (aiData) {
+            updated.horseCard = {
+              ...updated.horseCard,
+              aiInterpretation: aiData.interpretation,
+              keyAdvantage: aiData.keyAdvantage,
+              keyRisk: aiData.keyRisk,
+              tacticalRole: aiData.tacticalRole,
+              verdict: updated.verdict || updated.horseCard?.verdict
+            };
+          }
+
+          return updated;
+        });
+
+        // Re-sort table by AI-calibrated rank
+        enrichedPredictions.sort((a, b) => {
+          if (a.isScratched !== b.isScratched) return a.isScratched ? 1 : -1;
+          return (a.compositeRank || 999) - (b.compositeRank || 999);
+        });
+
+        setRaceData((prev) => ({
+          ...prev,
+          prediction: {
+            ...prev.prediction,
+            predictions: enrichedPredictions,
+            isAICalibrated: true
+          }
+        }));
+      }
+    } catch (err) {
+      console.error('AI Generation error:', err);
+      alert(`AI Analysis error: ${err.message}`);
+    } finally {
+      setIsLoadingAI(false);
+    }
   };
 
   const handleReSimulate = async (weights, simulations) => {
@@ -192,6 +309,16 @@ export default function App() {
               predictionData={raceData.prediction}
             />
 
+            {/* Gemini AI Analyst Strategy & Memory Panel */}
+            <AIAnalystPanel
+              aiAnalysis={aiAnalysis}
+              isLoadingAI={isLoadingAI}
+              onGenerateAI={handleGenerateAI}
+              onOpenPostRaceModal={() => setIsPostRaceModalOpen(true)}
+              onOpenMemoryModal={() => setIsMemoryModalOpen(true)}
+              memoryCount={memoryCount}
+            />
+
             {/* Grid Layout: Main Matrix + Side Controls */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
@@ -245,6 +372,23 @@ export default function App() {
           }}
         />
       ) : null}
+
+      {/* Post-Race Result & AI Self-Learning Modal */}
+      <PostRaceLearningModal
+        isOpen={isPostRaceModalOpen}
+        onClose={() => setIsPostRaceModalOpen(false)}
+        raceData={raceData}
+        onLearningCompleted={(result) => {
+          refreshMemoryCount();
+        }}
+      />
+
+      {/* AI Knowledge Base / Memory Modal */}
+      <AIMemoryModal
+        isOpen={isMemoryModalOpen}
+        onClose={() => setIsMemoryModalOpen(false)}
+        onMemoryUpdated={refreshMemoryCount}
+      />
 
       {/* Footer */}
       <footer className="border-t border-slate-800 bg-[#0f172a] py-6 text-center text-xs text-slate-500 font-mono">

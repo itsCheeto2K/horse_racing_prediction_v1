@@ -1,6 +1,6 @@
 import os
 from datetime import date
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -13,6 +13,7 @@ from composite_scorer import (
     validate_composite_weights,
     load_default_weights
 )
+from ai_service import ai_service
 
 load_dotenv()
 
@@ -180,6 +181,89 @@ def simulate_custom_weights(req: CustomSimulationRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+class AIAnalyzeRequest(BaseModel):
+    form: Dict[str, Any]
+    prediction: Dict[str, Any]
+
+
+class PostMortemRequest(BaseModel):
+    race_info: Dict[str, Any]
+    predicted_top3: List[Dict[str, Any]]
+    actual_top3: List[Dict[str, Any]]
+    all_predictions: Optional[List[Dict[str, Any]]] = None
+
+
+@app.post("/api/ai/analyze-race")
+def ai_analyze_race(req: AIAnalyzeRequest):
+    """
+    Performs AI-driven tactical analysis of the race using Gemini,
+    generates personalized runner interpretations, and applies past memory lessons.
+    """
+    try:
+        result = ai_service.analyze_race(req.form, req.prediction)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ai/post-mortem")
+def ai_post_mortem(req: PostMortemRequest):
+    """
+    Compares predicted top 3 with actual 1st, 2nd, 3rd results,
+    conducts an AI root-cause audit of mistakes, and saves newly learned rules into persistent memory.
+    """
+    try:
+        result = ai_service.post_mortem_learning(
+            race_info=req.race_info,
+            predicted_top3=req.predicted_top3,
+            actual_top3=req.actual_top3,
+            all_predictions=req.all_predictions
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/ai/memory")
+def get_ai_memory():
+    """
+    Returns stored AI memory: system rules, accumulated post-race lessons, and accuracy stats.
+    """
+    try:
+        return ai_service.get_memory()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/ai/memory/lessons/{lesson_id}")
+def delete_ai_lesson(lesson_id: str):
+    """
+    Deletes a specific lesson from AI memory by ID.
+    """
+    try:
+        success = ai_service.delete_lesson(lesson_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Lesson not found")
+        return {"status": "success", "deleted_id": lesson_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ai/memory/reset")
+def reset_ai_memory():
+    """
+    Resets AI memory to baseline.
+    """
+    try:
+        ai_service.reset_memory()
+        return {"status": "success", "message": "AI memory reset to default"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
+

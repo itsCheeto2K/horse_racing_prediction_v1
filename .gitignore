@@ -1,20 +1,28 @@
 # Environment variables & API Keys (DO NOT COMMIT)
 .env
 .env.*
+*.env
+**/.env
+**/.env.*
 !.env.example
+!**/.env.example
 
 # Python
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 venv/
 .venv/
 env/
+backend/logs/*.jsonl
 
 # Node / Frontend
-frontend/node_modules/
-frontend/dist/
-frontend/dist-ssr/
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
 *.local
 
 # C++ Build Artifacts & Binaries

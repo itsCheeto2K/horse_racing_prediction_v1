@@ -1,0 +1,857 @@
+{
+  "system_rules": [
+    "Always consider track condition (Good, Soft, Heavy) and weight carried when assessing stamina.",
+    "Horses stepping up in distance with strong closing speed at shorter distances often perform well.",
+    "High early pace often collapses in heavy ground, favoring late closers."
+  ],
+  "lessons": [
+    {
+      "id": "82cbfd23",
+      "date": "2026-09-02",
+      "track": "Hamilton Park",
+      "raceNumber": 1,
+      "distance": "1012m",
+      "condition": "Soft",
+      "predicted_top3": [
+        "Sod Hall Lane",
+        "Royal Strike",
+        "Bacha"
+      ],
+      "actual_top3": [
+        "Sod Hall Lane",
+        "Royal Strike",
+        "Bacha"
+      ],
+      "win_hit": true,
+      "top3_hits": 3,
+      "outcomeVerdict": "WIN_ACCURATE",
+      "rootCauseAnalysis": "The pre-race prediction successfully identified the exact top 3 finishers (Sod Hall Lane, Royal Strike, and Bacha) in the correct finishing order. The analytical engine properly evaluated Sod Hall Lane's superior ability score (56.9) and strong late momentum shown in a recent 2nd-place finish at Musselburgh, allowing it to handle the 1012m distance on Soft ground effectively. Royal Strike and Bacha performed close to expectations, filling out the placings as Tier A main contenders backed by solid recent form in competitive sprinting events.",
+      "keyMissedFactors": [
+        "Perfect trifecta achieved; minor market underestimations on runner #3 and #1 place probabilities were successfully countered by core ability scores."
+      ],
+      "lesson_learned": "When a front-running or prominent runner displays superior recent acceleration metrics and adequate form on yielding or soft ground over short sprints (approx. 1000m), projecting them as the primary win candidate remains a highly robust strategy.",
+      "recommendedWeightAdjustment": "Maintain current balancing between ability scores and recent form ratings for short-distance soft-ground sprints.",
+      "created_at": "2026-09-03 09:26:10"
+    },
+    {
+      "id": "b058bc6f",
+      "date": "2026-09-02",
+      "track": "Hamilton Park",
+      "raceNumber": 2,
+      "distance": "1212m",
+      "condition": "Soft",
+      "predicted_top3": [
+        "Iris Dancer",
+        "Edgewater Drive",
+        "Lumenbourg"
+      ],
+      "actual_top3": [
+        "Big Apple Jack",
+        "Lumenbourg",
+        "Valentine Catcher"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The pre-race simulation heavily favored Iris Dancer, Edgewater Drive, and Lumenbourg based on baseline ability and broad soft-ground profiles, failing to anticipate the decisive upset by Big Apple Jack and the strong closing performance of Valentine Catcher. Hamilton Park on Soft ground heavily penalized front-running styles that failed to sustain endurance under testing conditions, while rewarding horses with superior stamina reserves and proven deep-going capabilities. The top predicted runners showed vulnerabilities in late-race stamina or failed to handle the exact severity of the soft surface at the critical closing stages.",
+      "keyMissedFactors": [
+        "Underestimated the specific stamina depth required on Hamilton Park's soft surface for the winner",
+        "Over-reliance on general class ratings over direct course-and-going adaptability for lower-tier runners"
+      ],
+      "lesson_learned": "On deep Soft or Heavy tracks, elevate track-specific going evidence over general class ratings, and heavily discount front-runners lacking demonstrated stamina reserves at the exact distance.",
+      "recommendedWeightAdjustment": "Increase Track/Condition Weight by +0.08 on Soft/Heavy surfaces and downweight raw ability scores when surface degradation is extreme.",
+      "created_at": "2026-09-03 09:31:33"
+    },
+    {
+      "id": "6beb06ce",
+      "date": "2026-09-02",
+      "track": "Hamilton Park",
+      "raceNumber": 3,
+      "distance": "2629m",
+      "condition": "Soft",
+      "predicted_top3": [
+        "Perseus Way",
+        "Clocker",
+        "Ebony Maw"
+      ],
+      "actual_top3": [
+        "Perseus Way",
+        "Spanish Hustle",
+        "Ebony Maw"
+      ],
+      "win_hit": true,
+      "top3_hits": 2,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "Perseus Way was correctly diagnosed as the winner, showcasing strong class ratings and solid late momentum despite carrying a heavy weight (64.5kg) on soft ground. However, Spanish Hustle outperformed expectations to take 2nd, while our 2nd predicted pick (Clocker) and 3rd predicted pick (Ebony Maw) filled other roles, with Ebony Maw hitting 3rd. The models successfully captured the top pick's dominance but under-weighted the impact of soft ground stamina profiles which elevated Spanish Hustle into the runner-up spot over less versatile rivals.",
+      "keyMissedFactors": [
+        "Underestimated the soft ground stamina and adaptability profile of Spanish Hustle",
+        "Over-reliance on immediate last-start form at shorter trips for fringe contenders over stamina-testing soft ground"
+      ],
+      "lesson_learned": "When races are run on Soft or Heavy ground over extended distances (exceeding 2400m), horses with verified stamina and proven soft-track form take precedence over recent speed-based winners stepping up in trip.",
+      "recommendedWeightAdjustment": "Increase Track/Condition Suitability Weight by +0.08 and reduce Raw Speed/Class Weight by -0.05 on Soft or Heavy going.",
+      "created_at": "2026-09-03 09:32:20"
+    },
+    {
+      "id": "20a186a2",
+      "date": "2026-09-02",
+      "track": "Hamilton Park",
+      "raceNumber": 4,
+      "distance": "1212m",
+      "condition": "Soft",
+      "predicted_top3": [
+        "Battle Fever",
+        "Trumpety Trump",
+        "Harley"
+      ],
+      "actual_top3": [
+        "Trumpety Trump",
+        "Sea Mirage",
+        "Battle Fever"
+      ],
+      "win_hit": false,
+      "top3_hits": 2,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "The pre-race top pick 'Battle Fever' (Runner 1) ran a strong race but ultimately had to settle for 3rd after carrying a heavy weight burden (61kg) on testing Soft conditions at Hamilton Park. The actual winner, 'Trumpety Trump' (Runner 3), capitalized on a much lighter weight (55.5kg) which proved decisive on the stamina-sapping ground, out-battling the field alongside the improver 'Sea Mirage' (Runner 5), who outperformed its longshot status by utilizing course familiarity and favorable ground conditions.",
+      "keyMissedFactors": [
+        "Underestimated the decisive weight-carrying disadvantage of top-weight Battle Fever (61kg) on Soft ground compared to lighter-weighted rivals",
+        "Undervalued track-specific stamina and course adaptability for lower-weighted runners on testing ground at Hamilton"
+      ],
+      "lesson_learned": "On Soft or Heavy ground conditions, heavily penalize top-weights giving away excessive weight (60kg+) to progressive lightweight rivals unless clear class dominance is established.",
+      "recommendedWeightAdjustment": "Increase Condition and Weight Penalty/Advantage importance by +0.10 for all turf races rated Soft or Heavy.",
+      "created_at": "2026-09-03 09:32:54"
+    },
+    {
+      "id": "914160f0",
+      "date": "2026-09-02",
+      "track": "Hamilton Park",
+      "raceNumber": 5,
+      "distance": "1212m",
+      "condition": "Soft",
+      "predicted_top3": [
+        "Lily Pearl",
+        "Kilfrush Desert",
+        "Mae Amor"
+      ],
+      "actual_top3": [
+        "Annie Edson Taylor",
+        "Diamont Katie",
+        "Invincible Ruby"
+      ],
+      "win_hit": false,
+      "top3_hits": 0,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The model's top predictions (Lily Pearl, Kilfrush Desert, and Mae Amor) all suffered from a combination of poor tactical mapping on the Soft going at Hamilton Park and over-reliance on recent form lines that did not translate to testing ground conditions. The actual winner, Annie Edson Taylor, and minor placegetters Diamont Katie and Invincible Ruby benefited from superior handling of the demanding soft surface which was heavily discounted by baseline metrics favoring drier historical runs.",
+      "keyMissedFactors": [
+        "Underestimated the heavy ground stamina and specific soft-track affinity of outsiders like Annie Edson Taylor and Diamont Katie.",
+        "Over-reliance on recent finishing positions from races contested on Good to Firm ground without heavily penalizing runners lacking proven soft-going form."
+      ],
+      "lesson_learned": "When racing on Soft or Heavy turf conditions, surface adaptability and proven wet-track pedigree must heavily outweigh general class ratings and recent speed figures achieved on fast ground.",
+      "recommendedWeightAdjustment": "Increase Track/Condition Weight coefficient by +0.10 on Soft/Heavy tracks and apply a harsher penalty to runners with unproven or negative heavy-ground form profiles.",
+      "created_at": "2026-09-03 09:33:36"
+    },
+    {
+      "id": "c50178b5",
+      "date": "2026-09-02",
+      "track": "Hamilton Park",
+      "raceNumber": 6,
+      "distance": "1671m",
+      "condition": "Soft",
+      "predicted_top3": [
+        "Penelope's Sister",
+        "Yaaser",
+        "Tee Aitch Aye"
+      ],
+      "actual_top3": [
+        "Tee Aitch Aye",
+        "Aurelune",
+        "Scheffler"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "The pre-race top pick 'Penelope's Sister' carried top weight (61.5kg) on Soft ground and failed to quicken inside the final furlong, ultimately fading. Meanwhile, the actual winner, 'Tee Aitch Aye', was correctly flagged as a Tier A Main Contender with positive late momentum and solid ground form (1 win from 4 on Soft). The major model miss was 'Aurelune' (finished 2nd at double-digit odds), whose high distance and race-fit scores (52.2) were slightly discounted by the model due to unproven track conditions, but who handled the deep ground expertly.",
+      "keyMissedFactors": [
+        "Underestimated the stamina and closing ability of Aurelune under Soft conditions despite high race-fit and distance scores.",
+        "Over-reliance on top-weight runner Penelope's Sister without adequately penalizing the burden under tiring conditions."
+      ],
+      "lesson_learned": "When track conditions are Soft or Heavy, horses with demonstrated stamina progression and positive late-closing tactics should be upgraded over top-weight runners carrying heavy burdens, as heavy ground neutralizes raw class advantages and amplifies stamina requirements.",
+      "recommendedWeightAdjustment": "Increase Distance and Condition weight penalties by +0.08 on Soft/Heavy tracks while applying a stricter weight-carrying penalty for top-weights over testing ground.",
+      "created_at": "2026-09-03 09:34:40"
+    },
+    {
+      "id": "3829ec38",
+      "date": "2026-09-02",
+      "track": "Kempton Park",
+      "raceNumber": 1,
+      "distance": "1408m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Musical Soldier",
+        "Chapman's Peak",
+        "Something Coming"
+      ],
+      "actual_top3": [
+        "Unionville",
+        "Orange Emperor",
+        "Chapman's Peak"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The pre-race top pick, Musical Soldier, held strong metrics and a prominent running style but failed to close out the win under high-pressure pace dynamics on the All Weather surface, finishing out of the frame. Unionville, priced as an outsider, capitalized on a high-pressure early pace where front-runners likely faded, launching a late challenge alongside Orange Emperor. Chapman's Peak ran true to expectations as a value underdog, securing 3rd place by maintaining an on-pace tactical position that survived the speed duel better than the favorite.",
+      "keyMissedFactors": [
+        "Underestimated vulnerability of the primary front-runner under high early pressure pace maps on All Weather.",
+        "Over-weighted top-rated speed figures while ignoring the hidden upside of lightly raced or improving stayers like Unionville."
+      ],
+      "lesson_learned": "When a race features multiple high-pressure front-runners on All Weather tracks, heavily favor late closers or well-drawn on-pace types with proven stamina over dominant leaders who are prone to pace collapses.",
+      "recommendedWeightAdjustment": "Increase Race Map / Pace Pressure Weight by +0.05 on All Weather sprints and miles, and penalize front-runners in high-pressure tactical environments.",
+      "created_at": "2026-09-03 09:35:41"
+    },
+    {
+      "id": "02c9a272",
+      "date": "2026-09-02",
+      "track": "Kempton Park",
+      "raceNumber": 2,
+      "distance": "1408m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Gold Army",
+        "Jeepers Fortune",
+        "Abersoch"
+      ],
+      "actual_top3": [
+        "Charlemont Gg",
+        "Gold Army",
+        "Or Ever"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The model heavily over-indexed on Gold Army due to superior baseline form and class ratings, correctly placing it 2nd. However, the race was won by Charlemont Gg, an unpredicted runner whose complete profile was omitted from the primary simulation matrix, highlighting a blind spot in processing full-field debutant or lightly raced entries. Furthermore, Or Ever outperformed expectations to secure 3rd, capitalizing on a race dynamic where early pace pressure ('High Pressure' pace fit indicated in the model) caused the prominent runners to fade, allowing closers and surprise packages to fill the minor placings.",
+      "keyMissedFactors": [
+        "Underestimation of pace collapse impact on front-running and stalker profiles",
+        "Omission/mispricing of unheralded runners (Charlemont Gg and Or Ever) who outperformed their baseline power ratings in an open all-weather context"
+      ],
+      "lesson_learned": "In all-weather races with 'High Pressure' pace tags, heavily favor horses with proven closing or stamina traits over purely form-based stalkers, and ensure lower-tier or lightly raced runners receive deeper evaluation rather than defaulting to flat minimum baseline scores.",
+      "recommendedWeightAdjustment": "Increase Race Map and Pace Scenarios Weight by +0.05 on All Weather sprints/middles to heavily penalize pace-vulnerable runners.",
+      "created_at": "2026-09-03 09:36:19"
+    },
+    {
+      "id": "9fa44211",
+      "date": "2026-09-02",
+      "track": "Kempton Park",
+      "raceNumber": 3,
+      "distance": "1207m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Sierra Belle",
+        "I Am Royal",
+        "Stormy Winter"
+      ],
+      "actual_top3": [
+        "Sierra Belle",
+        "I Am Royal",
+        "Al Widyan"
+      ],
+      "win_hit": true,
+      "top3_hits": 2,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "Sierra Belle (1st) validated top-tier predictions with superior class and form lines, successfully converting her pre-race favoritism despite a high pressure pace shape. I Am Royal (2nd) ran to expectations using solid on-pace progression. However, Al Widyan (3rd) crashed the trifecta from rank 5 (fair odds 98.04, market odds 28.72), outperforming a low model place probability (11.18%) due to elite jockey booking (William Buick) and a relatively weak deep-field tail where lower-tier runners failed to sustain their bids.",
+      "keyMissedFactors": [
+        "Elite jockey factor (William Buick on Al Widyan) over-performing baseline synthetic power ratings",
+        "Underestimation of depth-of-field volatility in a race dominated by unexposed/low-rated runners"
+      ],
+      "lesson_learned": "When a race features a heavily skewed favorite with lower-tier runners possessing flat or close ratings, top-tier connections (jockey/trainer combinations like Buick/Balding) must be given an upward adjustment in minor place calculations to prevent missing longshot trifecta inclusions.",
+      "recommendedWeightAdjustment": "Increase Connection/Jockey weight factor by +0.03 in low-class or low-rated all-weather handicaps where rider capability can heavily influence minor placings.",
+      "created_at": "2026-09-03 09:37:00"
+    },
+    {
+      "id": "9fb08e9a",
+      "date": "2026-09-02",
+      "track": "Kempton Park",
+      "raceNumber": 4,
+      "distance": "2211m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Fortitudine",
+        "Shadow Road",
+        "Roxy Power"
+      ],
+      "actual_top3": [
+        "Fortitudine",
+        "Shadow Road",
+        "Brave Hunter"
+      ],
+      "win_hit": true,
+      "top3_hits": 2,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "Fortitudine (1st) delivered as heavily favored on the All Weather surface, utilizing their prominent running style and elite ability score (93.2) to dominate from the front under William Buick. Shadow Road (2nd) outperformed expectations given their longshot market status, validating their high place probability and strong late momentum shown in recent Kempton outings. However, the model failed to secure a clean trifecta because Brave Hunter (3rd) surpassed secondary projections, sneaking into the frame ahead of Roxy Power due to more exposed baseline form and stamina staying power on the synthetic surface.",
+      "keyMissedFactors": [
+        "Underestimated structural stamina of exposed all-weather runners like Brave Hunter for the bottom of trifectas",
+        "Over-reliance on unexposed upside (Roxy Power) over reliable synthetic track course experience"
+      ],
+      "lesson_learned": "In all-weather middle-distance events, prioritize runners with proven course track-and-distance form profiles over unexposed profiles when filling lower tier exotic slots.",
+      "recommendedWeightAdjustment": "Increase Track/Condition weight preference by +0.05 for All Weather surfaces to heavily weight proven course form over hidden potential.",
+      "created_at": "2026-09-03 09:37:46"
+    },
+    {
+      "id": "6586af95",
+      "date": "2026-09-02",
+      "track": "Kempton Park",
+      "raceNumber": 5,
+      "distance": "1207m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Remi Mae",
+        "Egotistical",
+        "Zoustar Dreams"
+      ],
+      "actual_top3": [
+        "Remi Mae",
+        "Amelia's Joy",
+        "Startled Lady"
+      ],
+      "win_hit": true,
+      "top3_hits": 1,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "Remi Mae (Top Pick) delivered a professional performance to win the race, validating the core ability and pace ratings. However, the exact Trifecta failed because the model favored Egotistical and Zoustar Dreams for the minor placings, whereas Amelia's Joy (ranked 5th by the model) outperformed expectations to finish 2nd, and Startled Lady finished 3rd. Amelia's Joy benefited from a softer-than-expected pace profile that allowed her to sustain a wide tracking run on the all-weather surface, overriding her lower class score.",
+      "keyMissedFactors": [
+        "Underestimated the resilience of lower-tier runners (Amelia's Joy) on all-weather track dynamics where overall course experience outweighed class ratings.",
+        "Over-reliance on recent turf-form lines for secondary contenders which did not fully translate to the synthetic Kempton surface speed map."
+      ],
+      "lesson_learned": "In all-weather sprint races at Kempton, experienced course specialists with deep synthetic track history (such as Amelia's Joy) carry a higher place equity than raw ability or class metrics suggest, especially when front-running pressure distributes the energy load evenly.",
+      "recommendedWeightAdjustment": "Increase Track/Condition and All-Weather course experience weight by +0.05 while slightly lowering the penalty for lower-class runners who possess proven synthetic surface stamina.",
+      "created_at": "2026-09-03 09:38:29"
+    },
+    {
+      "id": "bd32397f",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 1,
+      "distance": "2050m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Koko Blue",
+        "Ravenscraig Castle",
+        "Kameel"
+      ],
+      "actual_top3": [
+        "Koko Blue",
+        "Ravenscraig Castle",
+        "It's A Love Thing"
+      ],
+      "win_hit": true,
+      "top3_hits": 2,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "The top pick and winner, Koko Blue, was accurately identified based on superior recent form and a positive performance trajectory suitable for the 2050m distance on All Weather. The second pick, Ravenscraig Castle, managed to hit the frame as predicted (finishing 2nd). However, the trifecta failed because the third predicted horse (Kameel) missed the frame, replaced by It's A Love Thing. It's A Love Thing outperformed its longshot status and poor recent form (8th of 8) by leveraging its extensive historical experience on All Weather surfaces (7 wins from 42 starts), exposing an undervaluation of deep track-specific experience in favor of recent turf/synthetic mixed form.",
+      "keyMissedFactors": [
+        "Underestimated course-specific All Weather depth (It's A Love Thing holding 7 prior wins on the surface)",
+        "Over-penalization of a single poor recent form line for experienced synthetic specialists"
+      ],
+      "lesson_learned": "For All Weather races over staying distances (2000m+), historical track-and-condition win counts must outweigh isolated recent poor runs when assessing lower-tier outsiders.",
+      "recommendedWeightAdjustment": "Increase Track/Condition historical win count weighting by +0.08 for All Weather races, softening the recency penalty for veteran course specialists.",
+      "created_at": "2026-09-03 09:39:45"
+    },
+    {
+      "id": "3a076d96",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 2,
+      "distance": "2050m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Dalamara",
+        "Baldosa",
+        "Diamond Aura"
+      ],
+      "actual_top3": [
+        "Rugby Union",
+        "Gifts Differing",
+        "Dalamara"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The pre-race top pick 'Dalamara' managed to finish 3rd but failed to convert favoritism into a win, while the actual winner 'Rugby Union' (not listed in the top selections previewed or performing strongly in model win probability) and 2nd place 'Gifts Differing' outperformed expectations. The race unfolded on an All-Weather surface where tactical speed and proven course/distance suitability frequently override synthetic recency bias. The model relied too heavily on recent turf or flat-track momentum for Dalamara carrying a heavier weight burden (63.5kg), while underestimating the ability of lightly-weighted or overlooked profiles to handle the Newcastle 2050m all-weather track profile.",
+      "keyMissedFactors": [
+        "Underestimated bottom-weight/mid-tier runners on All-Weather stamina tests",
+        "Over-reliance on recent turf form vs. specific all-weather track surface aptitude"
+      ],
+      "lesson_learned": "On All-Weather surfaces over intermediate to staying trips (2050m+), prioritize proven course-and-distance track specialists over high-weight recent turf winners carrying impost penalties.",
+      "recommendedWeightAdjustment": "Increase All-Weather track-surface specific scoring weight by +0.08 and apply a stronger weight-carries-penalty dampener for top-weights on synthetic tracks.",
+      "created_at": "2026-09-03 09:40:19"
+    },
+    {
+      "id": "f7cd68bf",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 3,
+      "distance": "1207m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Yordan",
+        "Brash",
+        "Joud"
+      ],
+      "actual_top3": [
+        "Yordan",
+        "Brash",
+        "Triple P"
+      ],
+      "win_hit": true,
+      "top3_hits": 2,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "The primary selection Yordan correctly converted as the dominant class benchmark and recent winner, securing first place. However, the exact trifecta missed due to Triple P (runner #6) crashing the top 3 at long odds, replacing Joud. Triple P benefited from a competitive pace scenario despite low-rated consistency metrics, exploiting the synthetic track conditions better than expected from raw figures.",
+      "keyMissedFactors": [
+        "Underestimated All-Weather surface progression for unexposed longshots like Triple P",
+        "Over-reliance on historical consistency scores which penalized lightly-raced outsiders unfairly"
+      ],
+      "lesson_learned": "When evaluating All-Weather sprints with a heavy favorite, account for synthetic track pedigree even among secondary runners whose low consistency scores might mask an unexposed profile.",
+      "recommendedWeightAdjustment": "Increase All-Weather surface adaptability weighting by +0.05 when filtering lower-tier runners for exotic combinations.",
+      "created_at": "2026-09-03 09:40:46"
+    },
+    {
+      "id": "e1a9f736",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 4,
+      "distance": "1421m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Highland Shah",
+        "Up The Agenda",
+        "Orne"
+      ],
+      "actual_top3": [
+        "Beattie Is Back",
+        "Highland Shah",
+        "Havana Prince"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The winner, Beattie Is Back (Runner #6), was flagged as a 'Best Longshot' and 'Dark Horse' with high value metrics (proven track and distance credentials with 4 wins on All Weather and a recent 3rd of 9 at Southwell), yet the prediction engine heavily over-indexed on the top pick Highland Shah due to raw overall ability scores. Beattie Is Back successfully utilized its proven All Weather profile and stalked the pace effectively on the synthetic surface, whereas Highland Shah managed only to run into 2nd place. The model failed to sufficiently weight proven course-and-distance track form over raw composite capability ratings on specialized All Weather surfaces.",
+      "keyMissedFactors": [
+        "Underestimated the historical All Weather surface win strike-rate of Beattie Is Back (4 wins from 27 starts)",
+        "Excessive reliance on raw ability and recent turf-to-synthetic transition metrics for the favorite Highland Shah",
+        "Failure to elevate a confirmed distance-proven stalker in an even-pace All Weather setup"
+      ],
+      "lesson_learned": "On All Weather (synthetic) tracks, horses with proven surface and course credentials (multiple wins on the specific track type) must be weighted significantly higher in win probability models, even if their recent class/ability scores sit lower than a more lightly raced favorite.",
+      "recommendedWeightAdjustment": "Increase Track/Condition and Track-Distance Specificity Weight by +0.10 for All Weather surface events, discounting raw class scores when surface experience is missing.",
+      "created_at": "2026-09-03 09:41:21"
+    },
+    {
+      "id": "e1be9c92",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 5,
+      "distance": "1207m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Bladey Lady",
+        "Liveadream",
+        "Profitability"
+      ],
+      "actual_top3": [
+        "Bladey Lady",
+        "Claret Time",
+        "Yorkshire Dream"
+      ],
+      "win_hit": true,
+      "top3_hits": 1,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "Bladey Lady performed true to expectations by winning the race from the top of the predicted ticket, validated by her strong ensemble win metrics and high model ability score (32.1). However, the model missed minor-tier placegetters Claret Time and Yorkshire Dream, miscalculating the ability of runners slipping under the radar outside the primary tier. The all-weather surface at Newcastle heavily favoured forward runners who could sustain speed, but subtle value runners capitalized on fitness margins that the model's strict recent-form weightings underestimated.",
+      "keyMissedFactors": [
+        "Underestimated synthetic surface preference for unexpected runners like Claret Time",
+        "Over-reliance on recent turf form profiles when projecting all-weather conversion rates"
+      ],
+      "lesson_learned": "When evaluating low-tier or lightly raced runners on all-weather surfaces, prioritize surface-specific breeding and historical track variants over raw turf class ratings.",
+      "recommendedWeightAdjustment": "Increase the weighting of All-Weather track surface statistics by +0.07 while scaling back the recency bias of turf-based recent form lines.",
+      "created_at": "2026-09-03 09:41:58"
+    },
+    {
+      "id": "99398309",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 6,
+      "distance": "1613m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Rising Force",
+        "Starliner",
+        "Mr Mistoffelees"
+      ],
+      "actual_top3": [
+        "Sunriseontheboyne",
+        "Starliner",
+        "Criminal Shore"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The race was won by Sunriseontheboyne, who returned at longer odds (composite fair odds around 10.5) and outperformed predictions by capitalising on an All Weather track setup where its past synthetic proficiency (4 wins from 23 starts) was undervalued. Pre-race favorites Rising Force and Starliner bore heavy burdens and high pace pressure profiles, resulting in a late fade for top picks. The model overweighted recent turf/grass form lines while discounting hidden synthetic surface capabilities and solid stable strike-rates of connections (Ben Haslam), allowing a value runner to steal the crown.",
+      "keyMissedFactors": [
+        "Underestimated synthetic track capability of Sunriseontheboyne despite a strong 4-win record on All Weather",
+        "Overreliance on recent turf run form while ignoring suitability to the Newcastle All Weather surface"
+      ],
+      "lesson_learned": "When analyzing All Weather meetings, horses with proven surface statistics must receive a stronger positive weighting adjustment over recent mixed turf form lines, especially in competitive handicap contexts.",
+      "recommendedWeightAdjustment": "Increase All Weather track/condition proficiency score weight by +0.08 while decreasing the recency penalty for horses transitioning back to synthetic surfaces.",
+      "created_at": "2026-09-03 09:42:32"
+    },
+    {
+      "id": "cff6ef84",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 7,
+      "distance": "1005m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Let's Go Hugo",
+        "Papa Don't Preach",
+        "Lady Bouquet"
+      ],
+      "actual_top3": [
+        "Ellie's De Vega",
+        "Let's Go Hugo",
+        "Lady Bouquet"
+      ],
+      "win_hit": false,
+      "top3_hits": 2,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The winner, Ellie's De Vega (Runner #7), was overlooked in the top selections primarily due to having limited or untested All-Weather statistics (0 wins from 10 starts on synthetic surfaces, and neutral track/distance scores), despite coming off a solid 6th of 16 run in a competitive larger-field race at Redcar. Meanwhile, our top pick Let's Go Hugo ran a strong 2nd carrying a heavy weight burden of 63.5kg, and Lady Bouquet filled 3rd. The high pace pressure environment caused front-running and heavy-weight profiles to tire slightly late, allowing Ellie's De Vega to capitalize on a hidden upside and less burdened weight (58kg) to steal the win.",
+      "keyMissedFactors": [
+        "Underestimated the lightweight advantage (58kg) of Ellie's De Vega against top-weighted market leaders carrying up to 63.5kg.",
+        "Over-penalized Ellie's De Vega's unproven All-Weather statistics while ignoring her strong recent class performance in a large 16-runner field."
+      ],
+      "lesson_learned": "In high-pressure sprint races on All-Weather tracks, downgrade top-weighted runners carrying heavy penalties if the pace map indicates severe early contention, and upgrade lightly-weighted runners coming out of competitive larger-field turf races even if their synthetic surface record is sparse.",
+      "recommendedWeightAdjustment": "Increase the weight allowance impact for bottom-weight runners in high-pressure synthetic sprints by +0.07, and reduce the strictness of All-Weather surface penalties when a horse shows superior class drop or large-field competitiveness.",
+      "created_at": "2026-09-03 09:43:22"
+    },
+    {
+      "id": "4d373f09",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 8,
+      "distance": "1613m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Book Of Life",
+        "Elettaria",
+        "Mercurius Power"
+      ],
+      "actual_top3": [
+        "Sassy Glory",
+        "Book Of Life",
+        "Hear The Drums"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The pre-race top selections favored Book Of Life and Elettaria, relying heavily on recent turf/synthetic run-styles and ability ratings. However, the winner, Sassy Glory (marked as an outsider), exploited an uncontested or favorable front-running/tactical scenario on the All-Weather surface despite limited prior wins at the track. Book Of Life managed to hold onto 2nd, while Hear The Drums (another outsider with winning momentum) surged into 3rd. The predictive model over-penalized Sassy Glory's lack of All Weather wins and placed too much emphasis on horses coming out of crowded midfield closing roles rather than forward--pressing profiles suited to Newcastle's 1613m layout.",
+      "keyMissedFactors": [
+        "Over-reliance on synthetic win statistics while ignoring raw early speed and tactical mapping for front-runners like Sassy Glory.",
+        "Underrating the last-start winning momentum and stamina progression of lower-tier runners like Hear The Drums stepping up to 1613m."
+      ],
+      "lesson_learned": "On All-Weather surfaces at 1613m, front-running profiles with tactical speed must not be heavily discounted simply due to a lack of course wins, especially when pace maps show minimal early pressure. Elevate the weight of early tactical positioning over raw composite ability ratings in synthetic route races.",
+      "recommendedWeightAdjustment": "Increase Pace/Tactical Map weight by +0.08 and reduce pure historical track-win penalty for lightly raced front-runners on All-Weather tracks.",
+      "created_at": "2026-09-03 09:43:52"
+    },
+    {
+      "id": "3bb55049",
+      "date": "2026-09-02",
+      "track": "Newcastle",
+      "raceNumber": 9,
+      "distance": "1613m",
+      "condition": "All Weather",
+      "predicted_top3": [
+        "Barleybrown",
+        "Here Comes Louie",
+        "Defence Missile"
+      ],
+      "actual_top3": [
+        "Walk On Walk On",
+        "Barleybrown",
+        "Here Comes Louie"
+      ],
+      "win_hit": false,
+      "top3_hits": 2,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "Walk On Walk On (runner #7) captured the win despite entering as a secondary tier runner with limited All-Weather evidence (0 wins from 9 starts). The model over-indexed on Barleybrown's class and speed figures while discounting the upward trajectory and weight advantage (58kg vs. 61kg top weight) of the lower-rated runners on the All-Weather surface. Although Barleybrown and Here Comes Louie secured minor places (2nd and 3rd), the winner's late energy distribution over the 1613m distance was underpriced by the handicap ratings.",
+      "keyMissedFactors": [],
+      "lesson_learned": "In low-class All-Weather handicaps over 1600m+, substantial weight differentials (3kg+) heavily favor lighter-weighted runners, neutralizing minor class advantages held by top-weight favorites.",
+      "recommendedWeightAdjustment": "Increase weight-carrying penalty impact by +0.05 and reduce pure class-rating dominance in low-grade All-Weather handicaps.",
+      "created_at": "2026-09-03 09:44:56"
+    },
+    {
+      "id": "fe825bd3",
+      "date": "2026-09-03",
+      "track": "Coffs Harbour",
+      "raceNumber": 1,
+      "distance": "1412m",
+      "condition": "Soft 5",
+      "predicted_top3": [
+        "Sorrenti",
+        "Birdy Girl",
+        "In Bocca Al Lupe"
+      ],
+      "actual_top3": [
+        "Sorrenti",
+        "Zweigelt",
+        "Birdy Girl"
+      ],
+      "win_hit": true,
+      "top3_hits": 2,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "The top pick Sorrenti validated expectations by comfortably winning the race, supported by clear statistical dominance and solid recent form. However, the model missed the 2nd place finisher, Zweigelt, who performed better than its composite rank (#5) suggested, while Birdy Girl held on for 3rd to keep the prediction partially accurate (2/3 top finishers correct). Zweigelt capitalized on a favorable midfield running style and positive tactical map score, outperforming its modest ability score on the Soft 5 track.",
+      "keyMissedFactors": [
+        "Underestimated the finishing potential of Zweigelt from barrier 7 on a Soft 5 track",
+        "Over-reliance on raw recent run position rather than sectional speed for mid-tier runners"
+      ],
+      "lesson_learned": "When evaluating races featuring dominant top picks on soft surfaces, ensure that stable runners with positive tactical race-map suitability (like Zweigelt trained by Matthew Dunn) are not overly discounted by lower composite ranking numbers.",
+      "recommendedWeightAdjustment": "Increase race-map and sectional suitability weighting by +0.05 on Soft tracks to better capture mid-tier horses capable of filling minor placings.",
+      "created_at": "2026-09-03 09:55:00"
+    },
+    {
+      "id": "4fd11fa5",
+      "date": "2026-09-03",
+      "track": "Coffs Harbour",
+      "raceNumber": 2,
+      "distance": "1212m",
+      "condition": "Soft 5",
+      "predicted_top3": [
+        "Insain Chaos",
+        "Piolla",
+        "Flying Monarch"
+      ],
+      "actual_top3": [
+        "Pearl Pendant",
+        "Insain Chaos",
+        "Rum And Kirk"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The pre-race top picks ('Insain Chaos', 'Piolla', and 'Flying Monarch') failed to secure the victory, which instead went to Pearl Pendant, with Rum And Kirk capturing 3rd. The predictive model heavily relied on baseline composite ratings and standard class scores while underestimating emerging unexposed profiles or subtle shifts in soft track capabilities. Insain Chaos managed to hold on for 2nd, but the winner bypassed the primary selection pool due to an oversight in assessing softer ground adaptability and hidden sectional progression.",
+      "keyMissedFactors": [
+        "Underestimated winning sectionals and soft track adaptability of Pearl Pendant",
+        "Over-reliance on stale baseline figures over immediate track-condition affinity"
+      ],
+      "lesson_learned": "When racing on Soft tracks (Soft 5), historical ability scores must be heavily discounted if horses lack proven wet-ground form lines; prioritize runners showing upward momentum on rain-affected surfaces.",
+      "recommendedWeightAdjustment": "Increase Soft/Heavy track condition weighting by +0.08 and apply a stronger dampening factor to horses with unproven soft-track ratings.",
+      "created_at": "2026-09-03 10:29:31"
+    },
+    {
+      "id": "a990c405",
+      "date": "2026-09-02",
+      "track": "Assiniboia Downs",
+      "raceNumber": 7,
+      "distance": "1207m",
+      "condition": "Good 4",
+      "predicted_top3": [
+        "Amplify",
+        "Not True",
+        "Jaya Rules"
+      ],
+      "actual_top3": [
+        "No Barb Wire",
+        "Jaya Rules",
+        "Not True"
+      ],
+      "win_hit": false,
+      "top3_hits": 2,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The winner, No Barb Wire (Barrier 5), was ranked 5th pre-race and capitalized on a stalking running style over the 1207m distance on Good 4 ground. While the model correctly identified Tier A contenders Jaya Rules (2nd) and Not True (3rd), it heavily misjudged the win probability of Amplify (ranked 1st, finished unplaced) due to overvaluing a bounce-back requirement from a poor recent run. No Barb Wire's prior demonstrated aptitude at 1207m proved superior to raw recent form metrics, allowing the stalker to benefit from tactical pace dynamics.",
+      "keyMissedFactors": [
+        "Underestimated the historical 1207m distance proficiency of No Barb Wire despite a modest recent 4th-place finish.",
+        "Overweighted recent form ratings for the top pick (Amplify) while discounting their inability to convert on a bounce-back run.",
+        "Failed to weigh the advantage of a clean stalking tactical role over front-runner heavy pressure profiles."
+      ],
+      "lesson_learned": "In sprint distances (approx. 1207m), proven track-and-distance form heavily outweighs recency bias when runners show negative recent form trajectories in lower classes; prioritize distance specialists sitting in mid-pack stalking roles over vulnerable front-runners under pressure.",
+      "recommendedWeightAdjustment": "Increase Distance/Track Proficiency Weight by +0.08 and apply a heavier penalty for front-running types flagged under high pace pressure.",
+      "created_at": "2026-09-03 10:30:58"
+    },
+    {
+      "id": "585cacfe",
+      "date": "2026-09-03",
+      "track": "Warrnambool",
+      "raceNumber": 1,
+      "distance": "1700m",
+      "condition": "Heavy 8",
+      "predicted_top3": [
+        "Winter Arc",
+        "Le Plus Rapide",
+        "All Moonlite"
+      ],
+      "actual_top3": [
+        "Le Plus Rapide",
+        "Halemo",
+        "Winter Arc"
+      ],
+      "win_hit": false,
+      "top3_hits": 2,
+      "outcomeVerdict": "PLACED_PARTIAL",
+      "rootCauseAnalysis": "Le Plus Rapide secured the win despite handling a Heavy 8 surface with previous unplaced stats because the heavy ground leveled out the playing field, making stamina and on-pace tactical tracking decisive over raw class. Winter Arc performed creditably to run 3rd as the top pick, but Halemo outperformed expectations (finishing 2nd from barrier 2) by capitalizing on an inside draw advantage on a heavy track that severely penalized wide-running backmarkers.",
+      "keyMissedFactors": [
+        "Underestimated the track bias favoring inside barriers (Gate 1 and Gate 2) on deep Heavy 8 ground at Warrnambool.",
+        "Overvalued raw recent form scores while under-weighting ground-saving tactical positions for mid-tier runners like Halemo."
+      ],
+      "lesson_learned": "On Heavy tracks (Heavy 8 or worse), low barriers (1-3) combined with on-pace running styles hold a massive compounding advantage over wide draws, even if the horse's historical heavy track stats show limited prior wins.",
+      "recommendedWeightAdjustment": "Increase Barrier and Condition Track Bias Weight by +0.08 on Heavy surfaces while discounting wide-draw runners with even modest stamina questions.",
+      "created_at": "2026-09-03 10:33:57"
+    },
+    {
+      "id": "542dd240",
+      "date": "2026-09-03",
+      "track": "Mackay",
+      "raceNumber": 1,
+      "distance": "1560m",
+      "condition": "Good 4",
+      "predicted_top3": [
+        "Check One Two",
+        "Gotcha Moment",
+        "Hot Luci"
+      ],
+      "actual_top3": [
+        "I Want It All",
+        "Shefflin",
+        "Gotcha Moment"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The pre-race top pick 'Check One Two' failed to convert despite strong overall metrics and an inside draw, succumbing to middle-distance stamina limitations or structural underperformance in the closing stages. Meanwhile, 'I Want It All' (ranked 5th with fair odds) capitalized on a balanced midfield journey to secure the win, showing that steady baseline profiles can outperform top-rated runners lacking specific distance evidence. 'Shefflin' also ran into the minor money unexpectedly, highlighting gaps in the model's lower-tier ranking matrix.",
+      "keyMissedFactors": [
+        "Over-reliance on top-rated recent form metrics while ignoring untested distance vulnerabilities for the favorite",
+        "Undervaluation of midfield tactical mapping for horses with consistent tracking runs like I Want It All"
+      ],
+      "lesson_learned": "When dealing with maidens or lightly raced runners over extended distances like 1560m, heavily penalize runners with untested distance profiles even if their general ability or recent form scores lead the field.",
+      "recommendedWeightAdjustment": "Increase Distance and Track-Specific Suitability Weight by +0.08 while decreasing raw recent form recency bias for races over 1400m.",
+      "created_at": "2026-09-03 10:48:09"
+    },
+    {
+      "id": "5095bd77",
+      "date": "2026-09-03",
+      "track": "Warrnambool",
+      "raceNumber": 2,
+      "distance": "1200m",
+      "condition": "Heavy 8",
+      "predicted_top3": [
+        "Silent Devotion",
+        "Grifter",
+        "Teia"
+      ],
+      "actual_top3": [
+        "Alchemistic",
+        "Silent Devotion",
+        "Teia"
+      ],
+      "win_hit": false,
+      "top3_hits": 2,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The winner, Alchemistic (Runner #2), was heavily discounted by the model due to a low ability score (24.2) and modest recent form (5th place finish), being ranked 6th out of 6 runners. The model heavily favored top-rated runners Silent Devotion and Grifter based on class and recent metrics. However, under testing Heavy 8 conditions at Warrnambool over 1200m, form lines from exposed runners proved to be a trap. Alchemistic benefited from a low weight allocation, an inside draw (barrier 3), and conditions that neutralized class advantages, allowing an outsider with stamina reserves to out-navigate the more heavily backed runners.",
+      "keyMissedFactors": [
+        "Underestimated the heavy track resilience and stamina of lower-rated runners like Alchemistic.",
+        "Over-reliance on recent numerical form indices while ignoring track-condition adaptability in low-confidence connection runners.",
+        "Failure to account for potential form reversals on testing Heavy 8 surfaces where barrier and tactical placement outweigh pure class."
+      ],
+      "lesson_learned": "On testing heavy tracks (Heavy 8 or worse), heavily discount exposed recent form if baseline ratings are built on firmer surfaces, and apply a higher variance penalty to top-rated favorites while upgrading runners with favorable low draws and proven wet-track/stamina profiles.",
+      "recommendedWeightAdjustment": "Increase Track/Condition Weight by +0.10 on Heavy surfaces and penalize higher-rated runners lacking proven heavy track form.",
+      "created_at": "2026-09-03 11:03:08"
+    },
+    {
+      "id": "641cb7e6",
+      "date": "2026-09-03",
+      "track": "Coffs Harbour",
+      "raceNumber": 3,
+      "distance": "1010m",
+      "condition": "Soft 5",
+      "predicted_top3": [
+        "Funky Cold Medina",
+        "Rubinsky",
+        "Pointy End"
+      ],
+      "actual_top3": [
+        "Sunset Adios",
+        "Rubinsky",
+        "Funky Cold Medina"
+      ],
+      "win_hit": false,
+      "top3_hits": 2,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The pre-race top pick 'Funky Cold Medina' ran well to finish 3rd, and 2nd pick 'Rubinsky' ran 2nd, but the unplaced/market outsider 'Sunset Adios' (implied by winner data) outran expectations. The system correctly captured the competitive frame through Rubinsky and Funky Cold Medina, but failed to isolate the winner's hidden upside, likely overlooking subtle track condition handling (Soft 5) or weight/barrier advantages that favored the winner over the heavily backed favorite.",
+      "keyMissedFactors": [
+        "Underestimated winning runner's tactical capability on Soft 5 going.",
+        "Over-reliance on top-rated recent form metrics for Funky Cold Medina, leading to an over-bet baseline."
+      ],
+      "lesson_learned": "When analyzing short-course sprints (approx. 1000m) on Soft tracks, minor track-condition adaptability heavily offsets nominal recent form advantages from dry tracks. Future models must penalize soft-track unproven favorites when unexposed runners have superior going profiles.",
+      "recommendedWeightAdjustment": "Increase Track/Condition Suitability weight by +0.08 on Soft/Heavy surfaces and apply a dampening factor to short-priced favorites with limited wet-track evidence.",
+      "created_at": "2026-09-03 11:08:00"
+    },
+    {
+      "id": "bc6fe07b",
+      "date": "2026-09-03",
+      "track": "Mackay",
+      "raceNumber": 2,
+      "distance": "1100m",
+      "condition": "Good 4",
+      "predicted_top3": [
+        "Elegant Venus",
+        "Lord Of The Flys",
+        "Auzangate"
+      ],
+      "actual_top3": [
+        "Hooroo",
+        "Elegant Venus",
+        "Proviseur"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The winner, Hooroo (Barrier 2), benefited significantly from an inside draw advantage (Barrier 2) on an 1100m sprint trip, allowing the runner to control or save optimal ground against the rail. The model over-indexed on Elegant Venus due to recent form trends while heavily undervaluing tactical maps and inside-barrier advantages for lightly-raced runners. Horses drawn wide (like Lord Of The Flys from Barrier 12 and Auzangate from Barrier 11) faced difficult tasks, though the top pick Elegant Venus managed to grab 2nd from Barrier 8. Hooroo's low barrier combined with Ryan Wiggins in the saddle proved decisive in a tight sprint where ground-saving was at a premium.",
+      "keyMissedFactors": [
+        "Underestimated the ground-saving power of inside barriers (Barrier 1-2) over short-course 1100m races at Mackay.",
+        "Over-reliance on recent form ratings while missing the tactical upside of a clean-slate runner drawn favorably."
+      ],
+      "lesson_learned": "In short-course sprints (1100m and under) on tighter provincial tracks, inside barriers combined with high-percentage jockeys must carry a higher multiplier in the composite model, overriding marginal advantages in exposed recent form from wide gates.",
+      "recommendedWeightAdjustment": "Increase Barrier Draw Weight by +0.08 for sprint races under 1200m and enhance inside-gate scoring curves.",
+      "created_at": "2026-09-03 11:24:30"
+    },
+    {
+      "id": "13b56111",
+      "date": "2026-09-03",
+      "track": "Warrnambool",
+      "raceNumber": 3,
+      "distance": "1200m",
+      "condition": "Heavy 8",
+      "predicted_top3": [
+        "I'Lberidin'Shotgun",
+        "Mister Solly",
+        "Northern Gold"
+      ],
+      "actual_top3": [
+        "Taajwar",
+        "Big Vee",
+        "Mister Solly"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The winner, Taajwar (Runner #9), was severely dismissed by the predictive model due to poor recent form (a 10th-place finish) and an unflattering 0-for-4 record on Heavy 8 tracks. However, in deep testing ground at Warrnambool (1200m), track conditions and stamina profiles heavily favored deep backmarkers who could handle the attritional going. The model over-indexed on the recent finishing positions of on-pace runners like I'Lberidin'Shotgun and Mister Solly, who failed to sustain their runs on the testing Heavy 8 surface under equal weights (59.5kg). Taajwar's prior distance experience and backmarker running style allowed it to swoop past tiring leaders in the heavy going.",
+      "keyMissedFactors": [
+        "Underestimated the severe attrition of the Heavy 8 track at Warrnambool which heavily penalized on-pace runners.",
+        "Over-penalized Taajwar's recent 10th-place run, missing that its historical distance experience was a stronger indicator on heavy ground than recent plain form.",
+        "Failed to account for the vulnerability of top-weighted runners (all carrying 59.5kg) getting stuck in testing ground."
+      ],
+      "lesson_learned": "On Heavy tracks (Soft 7/Heavy 8/9/10), downgrade the win probability of on-pace runners with poor historical wet-track records, and give higher weightage to backmarkers with proven distance fitness when the pace collapses due to ground conditions.",
+      "recommendedWeightAdjustment": "Increase Track/Condition and Distance fit weight by +0.08 on Heavy surfaces while discounting recent flat-track form recency bias by -0.05.",
+      "created_at": "2026-09-03 11:34:08"
+    }
+  ],
+  "stats": {
+    "total_evaluated": 29,
+    "win_hits": 9,
+    "top3_hits": 14,
+    "win_accuracy_rate": 31.0,
+    "place_accuracy_rate": 48.3
+  }
+}

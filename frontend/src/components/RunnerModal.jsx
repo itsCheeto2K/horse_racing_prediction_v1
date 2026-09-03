@@ -145,9 +145,39 @@ export default function RunnerModal({ runner, prediction, onClose }) {
               </div>
             </div>
 
-            <div className="text-xs text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/60 leading-relaxed font-sans">
-              <strong className="text-sky-300 font-mono">Interpretation: </strong>
-              {card.recentRunInterpretation || 'Demonstrated solid campaign readiness and competitive finishing speed.'}
+            {/* Dynamic AI / Form Interpretation */}
+            <div className="bg-slate-950/70 p-3 rounded-xl border border-sky-500/20 space-y-2 font-sans">
+              <div className="text-xs text-slate-200 leading-relaxed">
+                <strong className="text-sky-300 font-mono flex items-center gap-1.5 mb-1">
+                  <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                  {card.aiInterpretation ? 'Gemini AI Tactical Assessment:' : 'Interpretation: '}
+                </strong>
+                {card.aiInterpretation || card.recentRunInterpretation || 'Demonstrated solid campaign readiness and competitive finishing speed.'}
+              </div>
+
+              {/* Extra AI Insights if available */}
+              {(card.keyAdvantage || card.keyRisk || card.tacticalRole) && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-slate-800/80 text-[11px] font-mono">
+                  {card.tacticalRole && (
+                    <div className="bg-slate-900/90 px-2 py-1 rounded border border-slate-800">
+                      <span className="text-slate-400 text-[10px] block font-sans">Role / Style</span>
+                      <span className="text-sky-300 font-bold">{card.tacticalRole}</span>
+                    </div>
+                  )}
+                  {card.keyAdvantage && (
+                    <div className="bg-emerald-950/30 px-2 py-1 rounded border border-emerald-500/20">
+                      <span className="text-emerald-400 text-[10px] block font-sans">Key Advantage</span>
+                      <span className="text-emerald-200">{card.keyAdvantage}</span>
+                    </div>
+                  )}
+                  {card.keyRisk && (
+                    <div className="bg-amber-950/30 px-2 py-1 rounded border border-amber-500/20">
+                      <span className="text-amber-400 text-[10px] block font-sans">Key Vulnerability</span>
+                      <span className="text-amber-200">{card.keyRisk}</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
