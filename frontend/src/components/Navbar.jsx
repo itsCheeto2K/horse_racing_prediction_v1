@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Activity, Zap, Clock, Globe } from 'lucide-react';
+import { Calendar, Activity, Zap, Clock, Globe, KeyRound } from 'lucide-react';
 
 export function getLocalDateString(d = new Date()) {
   const year = d.getFullYear();
@@ -20,6 +20,8 @@ export default function Navbar({
   raceCode,
   onRaceCodeChange,
   healthStatus,
+  onOpenGeminiKeyModal,
+  hasGeminiKey = false
 }) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -78,7 +80,7 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Controls: Real-time clock, Race Types, Date Picker */}
+          {/* Controls: Real-time clock, Race Types, Date Picker, Key Config */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             
             {/* Live Clock & Timezone Widget (Desktop) */}
@@ -163,6 +165,22 @@ export default function Navbar({
                 className="bg-slate-900 text-slate-200 text-xs rounded-lg px-3 py-2 border border-slate-700 focus:outline-none focus:border-amber-500 font-mono"
               />
             </div>
+
+            {/* Gemini API Key Trigger Button */}
+            <button
+              onClick={onOpenGeminiKeyModal}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border text-xs font-mono transition-all ${
+                hasGeminiKey
+                  ? 'bg-sky-500/10 border-sky-500/30 text-sky-300 hover:bg-sky-500/20 hover:border-sky-400/50 shadow-sm'
+                  : 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25 animate-pulse'
+              }`}
+              title={hasGeminiKey ? 'Gemini API Key đã cấu hình. Nhấp để thay đổi hoặc kiểm tra.' : 'Chưa có Gemini API Key. Nhấp để nhập và kích hoạt!'}
+            >
+              <KeyRound className={`w-3.5 h-3.5 ${hasGeminiKey ? 'text-sky-400' : 'text-amber-400'}`} />
+              <span className="font-semibold">
+                {hasGeminiKey ? 'Gemini Active' : 'Nhập Gemini Key'}
+              </span>
+            </button>
 
             {/* Health & Engine Status */}
             <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">

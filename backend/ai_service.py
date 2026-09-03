@@ -144,13 +144,48 @@ class GeminiAIService:
         fixed = re.sub(r",\s*([\]}])", r"\1", clean_text)
         return json.loads(fixed)
 
-    def _call_gemini(self, prompt: str, system_instruction: Optional[str] = None, json_mode: bool = True) -> Dict[str, Any]:
-        """Calls Gemini API with failover models."""
-        models_to_try = [self.model, "gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest"]
+    def validate_key(self, api_key: str) -> tuple:
+        """Validates a Gemini API Key by pinging Google Generative Language models API."""
+        clean_key = (api_key or "").strip()
+        if not clean_key:
+            return False, "API Key không được để trống."
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models?key={clean_key}"
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                return True, "API Key hợp lệ và đã kết nối thành công với Google Gemini!"
+            else:
+                err_data = response.json() if response.text else {}
+                err_msg = err_data.get("error", {}).get("message", response.text[:150])
+                return False, f"Google API từ chối ({response.status_code}): {err_msg}"
+        except Exception as e:
+            return False, f"Lỗi kết nối kiểm tra API Key: {str(e)}"
+
+    def _call_gemini(
+        self,
+        prompt: str,
+        system_instruction: Optional[str] = None,
+        json_mode: bool = True,
+        custom_api_key: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Calls Gemini API with failover models and optional client-provided API key."""
+        active_key = (custom_api_key or "").strip() or self.api_key
+        if not active_key:
+            raise ValueError(
+                "Chưa có Gemini API Key! Vui lòng bấm vào nút '🔑 Nhập Gemini Key' trên thanh công cụ để nhập và kích hoạt API Key miễn phí từ Google AI Studio (aistudio.google.com)."
+            )
+
+        raw_models = [self.model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+        # Deduplicate while preserving order
+        models_to_try = []
+        for m in raw_models:
+            if m and m not in models_to_try:
+                models_to_try.append(m)
+
         last_err = None
 
         for m in models_to_try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={self.api_key}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={active_key}"
             payload: Dict[str, Any] = {
                 "contents": [{"parts": [{"text": prompt}]}]
             }
@@ -187,7 +222,12 @@ class GeminiAIService:
 
         raise Exception(f"Gemini API request failed on all models. Last error: {last_err}")
 
-    def analyze_race(self, form_data: Dict[str, Any], prediction_data: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_race(
+        self,
+        form_data: Dict[str, Any],
+        prediction_data: Dict[str, Any],
+        custom_api_key: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         Performs in-depth tactical analysis of the race, generates personalized runner interpretations,
         and applies past memory lessons.
@@ -334,7 +374,12 @@ Ensure EVERY active runner is included in BOTH 'calibratedRunners' and 'runnerIn
 Keep descriptions sharp, professional, realistic, and insightful in English.
 """
 
-        ai_response = self._call_gemini(prompt, system_instruction=system_instruction, json_mode=True)
+        ai_response = self._call_gemini(
+            prompt,
+            system_instruction=system_instruction,
+            json_mode=True,
+            custom_api_key=custom_api_key
+        )
         return ai_response
 
     def post_mortem_learning(
@@ -342,7 +387,8 @@ Keep descriptions sharp, professional, realistic, and insightful in English.
         race_info: Dict[str, Any],
         predicted_top3: List[Dict[str, Any]],
         actual_top3: List[Dict[str, Any]],
-        all_predictions: Optional[List[Dict[str, Any]]] = None
+        all_predictions: Optional[List[Dict[str, Any]]] = None,
+        custom_api_key: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Compares predictions with actual results, conducts an AI root-cause analysis of mistakes,
@@ -410,7 +456,12 @@ Perform a deep post-mortem analysis. Return a JSON object matching this structur
 }}
 """
 
-        audit_result = self._call_gemini(prompt, system_instruction=system_instruction, json_mode=True)
+        audit_result = self._call_gemini(
+            prompt,
+            system_instruction=system_instruction,
+            json_mode=True,
+            custom_api_key=custom_api_key
+        )
 
         # Store lesson into memory
         new_lesson = {

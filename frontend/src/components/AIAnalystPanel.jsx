@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Brain, Award, AlertTriangle, ShieldCheck, RefreshCw, Zap } from 'lucide-react';
+import { Sparkles, Brain, Award, AlertTriangle, ShieldCheck, RefreshCw, Zap, KeyRound } from 'lucide-react';
 
 export default function AIAnalystPanel({
   aiAnalysis,
@@ -7,6 +7,8 @@ export default function AIAnalystPanel({
   onGenerateAI,
   onOpenPostRaceModal,
   onOpenMemoryModal,
+  onOpenGeminiKeyModal,
+  hasGeminiKey = false,
   memoryCount = 0
 }) {
   return (
@@ -36,7 +38,21 @@ export default function AIAnalystPanel({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Gemini Key Config Button */}
+          <button
+            onClick={onOpenGeminiKeyModal}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold transition-all flex items-center gap-1.5 shadow-sm border ${
+              hasGeminiKey
+                ? 'bg-slate-800/80 hover:bg-slate-700/80 text-sky-300 border-slate-700 hover:border-sky-500/40'
+                : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40 animate-pulse'
+            }`}
+            title="Nhập và kích hoạt Google Gemini API Key"
+          >
+            <KeyRound className={`w-3.5 h-3.5 ${hasGeminiKey ? 'text-sky-400' : 'text-amber-400'}`} />
+            <span>{hasGeminiKey ? 'Gemini Key' : '🔑 Nhập Key'}</span>
+          </button>
+
           {/* AI Memory Button */}
           <button
             onClick={onOpenMemoryModal}
@@ -175,6 +191,15 @@ export default function AIAnalystPanel({
               Bấm nút <strong>"✨ Phân tích AI"</strong> để Gemini đọc toàn bộ thông số và tạo nhận định cá nhân hóa cho từng ngựa kèm bài học quá khứ.
             </span>
           </div>
+          {!hasGeminiKey && (
+            <button
+              onClick={onOpenGeminiKeyModal}
+              className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-mono font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+              <span>Chưa nhập Key? Kích hoạt ngay</span>
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -845,13 +845,43 @@
       "lesson_learned": "On Heavy tracks (Soft 7/Heavy 8/9/10), downgrade the win probability of on-pace runners with poor historical wet-track records, and give higher weightage to backmarkers with proven distance fitness when the pace collapses due to ground conditions.",
       "recommendedWeightAdjustment": "Increase Track/Condition and Distance fit weight by +0.08 on Heavy surfaces while discounting recent flat-track form recency bias by -0.05.",
       "created_at": "2026-09-03 11:34:08"
+    },
+    {
+      "id": "651f21ab",
+      "date": "2026-09-03",
+      "track": "Coffs Harbour",
+      "raceNumber": 4,
+      "distance": "1212m",
+      "condition": "Soft 5",
+      "predicted_top3": [
+        "Jewels Statement",
+        "Patrioticintention",
+        "A Touch From Fayt"
+      ],
+      "actual_top3": [
+        "Wanjina Rose",
+        "Patrioticintention",
+        "Cardsharp"
+      ],
+      "win_hit": false,
+      "top3_hits": 1,
+      "outcomeVerdict": "UPSET_MISSED",
+      "rootCauseAnalysis": "The pre-race top pick 'Jewels Statement' failed to secure a place, while the actual winner 'Wanjina Rose' (not listed in the main pre-race top 3 preview) capitalized on the Soft 5 ground conditions. The model over-indexed on the recent winning momentum of 'Jewels Statement' and 'A Touch From Fayt', while underestimating the class and track-specific suitability of emerging runners or omitted contenders like Cardsharp who managed to fill the trifecta alongside Patrioticintention.",
+      "keyMissedFactors": [
+        "Underestimated the adaptability of outside runners on the Soft 5 track condition",
+        "Over-reliance on recent start finishing position without a deeper sectional time analysis",
+        "Omission of sharp tactical speed profiles that suited the Coffs Harbour track layout on the day"
+      ],
+      "lesson_learned": "When analyzing Soft tracks at provincial circuits like Coffs Harbour, downgrade pure recency bias in favor of proven heavy/soft track winning distance specialists, and ensure bottom-tier or overlooked runners with favorable race maps aren't completely squeezed out by heavy favorite modeling.",
+      "recommendedWeightAdjustment": "Increase Track/Condition Weight by +0.08 on Soft/Heavy tracks and introduce a stricter penalty for horses stepping up in grade against proven wet-track specialists.",
+      "created_at": "2026-09-03 11:42:47"
     }
   ],
   "stats": {
-    "total_evaluated": 29,
+    "total_evaluated": 30,
     "win_hits": 9,
     "top3_hits": 14,
-    "win_accuracy_rate": 31.0,
-    "place_accuracy_rate": 48.3
+    "win_accuracy_rate": 30.0,
+    "place_accuracy_rate": 46.7
   }
 }

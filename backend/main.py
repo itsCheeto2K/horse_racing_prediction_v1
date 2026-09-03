@@ -184,6 +184,7 @@ def simulate_custom_weights(req: CustomSimulationRequest):
 class AIAnalyzeRequest(BaseModel):
     form: Dict[str, Any]
     prediction: Dict[str, Any]
+    gemini_api_key: Optional[str] = None
 
 
 class PostMortemRequest(BaseModel):
@@ -191,6 +192,22 @@ class PostMortemRequest(BaseModel):
     predicted_top3: List[Dict[str, Any]]
     actual_top3: List[Dict[str, Any]]
     all_predictions: Optional[List[Dict[str, Any]]] = None
+    gemini_api_key: Optional[str] = None
+
+
+class ValidateKeyRequest(BaseModel):
+    api_key: str
+
+
+@app.post("/api/ai/validate-key")
+def validate_gemini_key(req: ValidateKeyRequest):
+    """
+    Validates a user-supplied Gemini API key.
+    """
+    is_valid, message = ai_service.validate_key(req.api_key)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=message)
+    return {"status": "success", "message": message}
 
 
 @app.post("/api/ai/analyze-race")
@@ -200,8 +217,14 @@ def ai_analyze_race(req: AIAnalyzeRequest):
     generates personalized runner interpretations, and applies past memory lessons.
     """
     try:
-        result = ai_service.analyze_race(req.form, req.prediction)
+        result = ai_service.analyze_race(
+            form_data=req.form,
+            prediction_data=req.prediction,
+            custom_api_key=req.gemini_api_key
+        )
         return result
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -217,9 +240,12 @@ def ai_post_mortem(req: PostMortemRequest):
             race_info=req.race_info,
             predicted_top3=req.predicted_top3,
             actual_top3=req.actual_top3,
-            all_predictions=req.all_predictions
+            all_predictions=req.all_predictions,
+            custom_api_key=req.gemini_api_key
         )
         return result
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

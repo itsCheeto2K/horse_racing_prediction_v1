@@ -10,13 +10,15 @@ import MonteCarloStats from './components/MonteCarloStats';
 import AIAnalystPanel from './components/AIAnalystPanel';
 import PostRaceLearningModal from './components/PostRaceLearningModal';
 import AIMemoryModal from './components/AIMemoryModal';
+import GeminiKeyModal from './components/GeminiKeyModal';
 import { 
   fetchHealth, 
   fetchMeetings, 
   fetchRaceAndPrediction, 
   simulateCustomWeights,
   analyzeRaceWithAI,
-  fetchAIMemory
+  fetchAIMemory,
+  getStoredGeminiKey
 } from './services/api';
 import { AlertCircle, RefreshCw, Layers } from 'lucide-react';
 
@@ -39,11 +41,13 @@ export default function App() {
   const [modalRunner, setModalRunner] = useState(null);
   const [modalPrediction, setModalPrediction] = useState(null);
 
-  // AI Analyst state
+  // AI Analyst state & Gemini Key state
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [isPostRaceModalOpen, setIsPostRaceModalOpen] = useState(false);
   const [isMemoryModalOpen, setIsMemoryModalOpen] = useState(false);
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
+  const [hasGeminiKey, setHasGeminiKey] = useState(() => Boolean(getStoredGeminiKey()));
   const [memoryCount, setMemoryCount] = useState(0);
 
   // Load memory count on mount
@@ -141,9 +145,16 @@ export default function App() {
 
   const handleGenerateAI = async () => {
     if (!raceData || !raceData.form || !raceData.prediction) return;
+    
+    // If no key is configured locally or on backend, prompt modal
+    const localKey = getStoredGeminiKey();
+    if (!localKey && !healthStatus?.gemini_configured) {
+      // Still attempt, but if it fails we open the modal
+    }
+
     setIsLoadingAI(true);
     try {
-      const res = await analyzeRaceWithAI(raceData.form, raceData.prediction);
+      const res = await analyzeRaceWithAI(raceData.form, raceData.prediction, localKey);
       setAiAnalysis(res);
 
       // Map AI calibrated formula scores and interpretations directly into the main prediction table
@@ -218,7 +229,16 @@ export default function App() {
       }
     } catch (err) {
       console.error('AI Generation error:', err);
-      alert(`AI Analysis error: ${err.message}`);
+      const errMsg = err.message || '';
+      if (
+        errMsg.toLowerCase().includes('api key') || 
+        errMsg.toLowerCase().includes('api_key') ||
+        errMsg.includes('Chưa có Gemini API Key')
+      ) {
+        setIsKeyModalOpen(true);
+      } else {
+        alert(`AI Analysis error: ${errMsg}`);
+      }
     } finally {
       setIsLoadingAI(false);
     }
@@ -266,6 +286,8 @@ export default function App() {
         raceCode={raceCode}
         onRaceCodeChange={setRaceCode}
         healthStatus={healthStatus}
+        onOpenGeminiKeyModal={() => setIsKeyModalOpen(true)}
+        hasGeminiKey={hasGeminiKey}
       />
 
       {/* Main Container */}
@@ -316,6 +338,8 @@ export default function App() {
               onGenerateAI={handleGenerateAI}
               onOpenPostRaceModal={() => setIsPostRaceModalOpen(true)}
               onOpenMemoryModal={() => setIsMemoryModalOpen(true)}
+              onOpenGeminiKeyModal={() => setIsKeyModalOpen(true)}
+              hasGeminiKey={hasGeminiKey}
               memoryCount={memoryCount}
             />
 
@@ -388,6 +412,15 @@ export default function App() {
         isOpen={isMemoryModalOpen}
         onClose={() => setIsMemoryModalOpen(false)}
         onMemoryUpdated={refreshMemoryCount}
+      />
+
+      {/* Gemini API Key Management Modal */}
+      <GeminiKeyModal
+        isOpen={isKeyModalOpen}
+        onClose={() => setIsKeyModalOpen(false)}
+        onKeyUpdated={(key) => {
+          setHasGeminiKey(Boolean(key));
+        }}
       />
 
       {/* Footer */}
